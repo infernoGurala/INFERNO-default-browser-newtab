@@ -1,0 +1,19 @@
+[
+  { "label": "Youtube",   "url": "https://youtube.com",          "icon": "youtube" },
+  { "label": "ChatGPT",   "url": "https://chat.openai.com",      "icon": "chatgpt" },
+  { "label": "Slides",    "url": "https://slides.google.com",    "icon": "slides" },
+  { "label": "Utopia",    "url": "https://utopia.app",           "icon": "utopia" },
+  { "label": "Music",     "url": "https://music.youtube.com",    "icon": "music" },
+  { "label": "Morning",   "url": "https://morning.coffee",       "icon": "morning" },
+  { "label": "Documents", "url": "https://docs.google.com",      "icon": "documents" },
+  { "label": "Google",    "url": "https://google.com",           "icon": "google" },
+  { "label": "Inferalis", "url": "https://inferalis.space",      "icon": "inferalis" },
+  { "label": "Whatsapp",  "url": "https://web.whatsapp.com",     "icon": "whatsapp" },
+  { "label": "Github",    "url": "https://github.com",           "icon": "github" },
+  { "label": "Drive",     "url": "https://drive.google.com",     "icon": "drive" },
+  { "label": "Gmail",     "url": "https://mail.google.com",      "icon": "gmail" },
+  { "label": "Telegram",  "url": "https://web.telegram.org",     "icon": "telegram" },
+  { "label": "Gemini",    "url": "https://gemini.google.com",    "icon": "gemini" },
+  { "label": "Claude",    "url": "https://claude.ai",            "icon": "claude" },
+  { "label": "Todoist",   "url": "https://todoist.com",          "icon": "todoist" }
+]

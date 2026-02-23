@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +17,7 @@
   --muted: rgba(240,232,240,0.5);
   --accent: #e8d5f5;
   --card-bg: rgba(255,255,255,0.95);
+  --wallpaper-dim: 0.35;
 }
 
 body {
@@ -26,11 +26,20 @@ body {
   min-height: 100vh; overflow: hidden; position: relative;
 }
 
-/* ── BG ── */
+/* ── BACKGROUND ── */
 .bg-canvas {
   position: fixed; inset: 0; z-index: 0;
   background: radial-gradient(ellipse 80% 100% at 100% 60%, #5a2060 0%, #3a1545 30%, #2c1f2e 60%, #1a1020 100%);
+  background-size: cover; background-position: center;
+  transition: background 0.5s ease;
 }
+.wallpaper-dim {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: rgba(0,0,0,0); transition: background 0.4s;
+}
+body.has-wallpaper .wallpaper-dim { background: rgba(0,0,0,var(--wallpaper-dim,0.35)); }
+body.has-wallpaper .globe { display: none; }
+
 .globe {
   position: fixed; right: -8vw; bottom: -15vh;
   width: 55vw; height: 55vw; border-radius: 50%;
@@ -45,11 +54,11 @@ body {
     repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0px, transparent 1px, transparent 40px, rgba(255,255,255,0.025) 41px);
 }
 .grain {
-  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.35;
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.32;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 }
 
-/* ── THEMES ── */
+/* ── GRADIENT THEMES ── */
 [data-theme="midnight"] .bg-canvas { background: radial-gradient(ellipse 80% 100% at 100% 60%, #1a1a4a 0%, #0d0d2a 40%, #05050f 100%); }
 [data-theme="midnight"] .globe { background: radial-gradient(ellipse at 35% 35%, #2a2a7a 0%, #15154a 35%, #080820 100%); }
 [data-theme="forest"] .bg-canvas { background: radial-gradient(ellipse 80% 100% at 100% 60%, #1a4a20 0%, #0d2a12 40%, #050f07 100%); }
@@ -58,6 +67,8 @@ body {
 [data-theme="dusk"] .globe { background: radial-gradient(ellipse at 35% 35%, #8a3030 0%, #5a1818 35%, #200808 100%); }
 [data-theme="ocean"] .bg-canvas { background: radial-gradient(ellipse 80% 100% at 100% 60%, #0a3a6a 0%, #051a3a 40%, #020810 100%); }
 [data-theme="ocean"] .globe { background: radial-gradient(ellipse at 35% 35%, #1a5a8a 0%, #0a2a5a 35%, #041020 100%); }
+/* custom color theme — JS applies inline style to bg-canvas */
+[data-theme="custom"] .globe { display: none; }
 
 /* ── CLOCK ── */
 .clock-display {
@@ -80,7 +91,6 @@ body {
 
 /* ── PAGE ── */
 .page { position: relative; z-index: 2; padding: 56px 72px 40px; max-width: 900px; }
-
 .greeting {
   font-family: 'Fraunces', serif; font-size: 24px; font-weight: 400;
   color: var(--text); margin-bottom: 22px; letter-spacing: -0.2px;
@@ -95,7 +105,7 @@ body {
   width: 100%; box-shadow: 0 4px 40px rgba(0,0,0,0.3); transition: box-shadow 0.2s;
 }
 .search-bar:focus-within { box-shadow: 0 4px 50px rgba(0,0,0,0.35), 0 0 0 2px rgba(180,120,255,0.5); }
-.search-icon-wrap { color: #999; flex-shrink: 0; font-size: 18px; display:flex; align-items:center; }
+.search-icon-wrap { color: #999; flex-shrink: 0; font-size: 18px; display: flex; align-items: center; }
 .search-bar input { flex: 1; border: none; outline: none; background: none; font-family: 'Figtree', sans-serif; font-size: 15px; color: #1a1a2e; }
 .search-bar input::placeholder { color: #aaa; }
 .engine-pill {
@@ -122,9 +132,8 @@ body {
 .tab.dragging { opacity: 0.4; cursor: grabbing; }
 .tab-add-btn {
   width: 28px; height: 28px; border-radius: 7px;
-  border: 1.5px dashed rgba(255,255,255,0.2);
-  background: none; color: var(--muted); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  border: 1.5px dashed rgba(255,255,255,0.2); background: none; color: var(--muted);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
   font-size: 16px; transition: all 0.15s; margin-left: 6px;
 }
 .tab-add-btn:hover { border-color: rgba(255,255,255,0.45); color: var(--text); }
@@ -147,67 +156,69 @@ body {
 .app-icon i { font-size: 28px; color: #3a2a4a; line-height: 1; }
 .app-icon:hover { transform: translateY(-4px) scale(1.06); box-shadow: 0 14px 40px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.8) inset; }
 .app-name { font-size: 11.5px; font-weight: 400; text-align: center; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(240,232,240,0.85); }
-
 body.edit-mode .app-card:not(.add-app-card) .app-icon::after {
-  content: ''; position: absolute; inset: 0; border-radius: 17px;
+  content: '✕'; position: absolute; inset: 0; border-radius: 17px;
   background: rgba(200,20,60,0.88); color: white; font-size: 20px;
   display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s;
-  font-family: 'Figtree', sans-serif; font-weight: 600; content: '✕';
 }
 body.edit-mode .app-card:not(.add-app-card):hover .app-icon::after { opacity: 1; }
 body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
-
-.add-app-card .app-icon {
-  background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.2);
-  box-shadow: none; color: var(--muted);
-}
+.add-app-card .app-icon { background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.2); box-shadow: none; }
 .add-app-card .app-icon i { color: var(--muted); font-size: 22px; }
 .add-app-card:hover .app-icon { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
 .add-app-card .app-name { color: var(--muted); }
 
 /* ── SETTINGS PANEL ── */
 .settings-panel {
-  position: fixed; right: 0; top: 0; bottom: 0; width: 270px; z-index: 100;
-  background: rgba(25,12,32,0.97); backdrop-filter: blur(20px);
+  position: fixed; right: 0; top: 0; bottom: 0; width: 290px; z-index: 100;
+  background: rgba(18,10,26,0.97); backdrop-filter: blur(24px);
   border-left: 1px solid rgba(255,255,255,0.07);
   display: flex; flex-direction: column;
-  transform: translateX(100%); transition: transform 0.3s ease; overflow: hidden;
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); overflow: hidden;
 }
 .settings-panel.open { transform: translateX(0); }
 .settings-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
+  padding: 20px 18px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
 }
-.settings-header h3 { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 400; }
+.settings-header h3 { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 400; display: flex; align-items: center; gap: 8px; }
 .close-settings-btn {
-  width: 28px; height: 28px; border-radius: 7px;
+  width: 28px; height: 28px; border-radius: 8px;
   background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
   color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all 0.15s; font-size: 16px;
 }
-.close-settings-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
-.settings-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 22px; }
-.s-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 9px; display: block; }
+.close-settings-btn:hover { background: rgba(255,255,255,0.13); color: var(--text); }
+.settings-body { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 20px; }
+.settings-body::-webkit-scrollbar { width: 4px; }
+.settings-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+/* M3 section divider label */
+.s-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.3px; color: var(--muted); margin-bottom: 8px; display: block; font-weight: 600; }
 .s-inp {
   width: 100%; padding: 9px 12px; background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1); border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
   color: var(--text); font-family: 'Figtree', sans-serif; font-size: 13px; outline: none;
 }
-.s-inp option { background: #2c1f2e; }
+.s-inp option { background: #1a0d24; }
 .s-row { display: flex; gap: 8px; }
 .s-btn {
-  padding: 9px 14px; border-radius: 9px;
+  padding: 9px 14px; border-radius: 10px;
   background: rgba(200,150,255,0.18); border: 1px solid rgba(200,150,255,0.28);
   color: #e0c8ff; font-size: 12px; cursor: pointer; font-family: 'Figtree', sans-serif;
   transition: all 0.15s; white-space: nowrap;
 }
 .s-btn:hover { background: rgba(200,150,255,0.28); }
-.theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.t-sw { aspect-ratio: 1; border-radius: 9px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-.t-sw.active { border-color: rgba(255,255,255,0.8); transform: scale(1.1); }
+
+/* gradient theme swatches */
+.theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+.t-sw { aspect-ratio: 1; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+.t-sw.active { border-color: rgba(255,255,255,0.85); transform: scale(1.1); }
+
+/* export/import */
 .io-row { display: flex; gap: 8px; }
 .io-btn {
-  flex: 1; padding: 9px 10px; border-radius: 9px; text-align: center;
+  flex: 1; padding: 9px 10px; border-radius: 10px;
   font-size: 12px; cursor: pointer; font-family: 'Figtree', sans-serif;
   transition: all 0.15s; border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06); color: var(--text);
@@ -218,7 +229,108 @@ body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
 .io-btn.export:hover { background: rgba(100,220,150,0.1); }
 .io-btn.import { border-color: rgba(100,180,255,0.3); color: #a0c8ff; }
 .io-btn.import:hover { background: rgba(100,180,255,0.1); }
-.settings-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; color: var(--muted); line-height: 1.7; text-align: center; flex-shrink: 0; }
+.settings-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 11px; color: var(--muted); line-height: 1.8; text-align: center; flex-shrink: 0; }
+
+/* ── M3 SEGMENT CONTROL ── */
+.m3-segment {
+  display: flex; background: rgba(255,255,255,0.05);
+  border-radius: 50px; padding: 3px; gap: 2px;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.m3-seg-btn {
+  flex: 1; padding: 7px 0; border-radius: 50px; border: none; cursor: pointer;
+  font-family: 'Figtree', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--muted); background: none; transition: all 0.2s;
+}
+.m3-seg-btn.active { background: rgba(200,150,255,0.22); color: #e0c8ff; }
+.m3-tab-panel { display: none; }
+.m3-tab-panel.active { display: block; }
+
+/* ── M3 COLOR PICKER ── */
+.m3-palette-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.m3-color-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.m3-swatch {
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  border: 2.5px solid transparent; transition: all 0.18s; position: relative; flex-shrink: 0;
+}
+.m3-swatch:hover { transform: scale(1.2); }
+.m3-swatch.active { border-color: white; box-shadow: 0 0 0 3px rgba(255,255,255,0.25); transform: scale(1.18); }
+.m3-swatch.active::after {
+  content: '✓'; position: absolute; inset: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* custom color input row */
+.m3-custom-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.09); margin-top: 4px;
+}
+.m3-color-input {
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+  cursor: pointer; padding: 0; overflow: hidden; background: none; flex-shrink: 0;
+}
+.m3-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+.m3-color-input::-webkit-color-swatch { border: none; border-radius: 50%; }
+.m3-custom-info { flex: 1; }
+.m3-custom-info p { font-size: 12px; color: var(--text); margin-bottom: 2px; }
+.m3-custom-info span { font-size: 10px; color: var(--muted); }
+.m3-use-btn {
+  padding: 5px 12px; border-radius: 20px; font-size: 11px;
+  background: rgba(200,150,255,0.2); border: 1px solid rgba(200,150,255,0.3);
+  color: #e0c8ff; cursor: pointer; font-family: 'Figtree', sans-serif; transition: all 0.15s;
+}
+.m3-use-btn:hover { background: rgba(200,150,255,0.32); }
+
+/* ── WALLPAPER PANEL ── */
+.wallpaper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+.wp-thumb {
+  aspect-ratio: 16/9; border-radius: 10px; cursor: pointer; overflow: hidden;
+  border: 2px solid transparent; transition: all 0.18s; position: relative;
+  background: rgba(255,255,255,0.06);
+}
+.wp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s; }
+.wp-thumb:hover { border-color: rgba(200,150,255,0.5); }
+.wp-thumb:hover img { transform: scale(1.05); }
+.wp-thumb.active { border-color: #c896ff; }
+.wp-thumb.active::before {
+  content: '✓'; position: absolute; top: 5px; right: 6px; z-index: 2;
+  font-size: 11px; font-weight: 700; color: white;
+  background: #c896ff; border-radius: 50%;
+  width: 19px; height: 19px; display: flex; align-items: center; justify-content: center;
+}
+.wp-none {
+  aspect-ratio: 16/9; border-radius: 10px; cursor: pointer;
+  border: 2px dashed rgba(255,255,255,0.15); transition: all 0.18s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 5px; color: var(--muted); font-size: 11px; grid-column: 1/-1;
+}
+.wp-none i { font-size: 22px; }
+.wp-none:hover { border-color: rgba(255,255,255,0.35); color: var(--text); }
+.wp-none.active { border-color: #c896ff; color: #e0c8ff; border-style: solid; }
+
+/* dim slider */
+.dim-row { display: flex; align-items: center; gap: 10px; }
+.dim-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.m3-slider {
+  flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.15); outline: none; cursor: pointer;
+}
+.m3-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: #c896ff; border: 2px solid white; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.dim-val { font-size: 11px; color: var(--muted); width: 30px; text-align: right; }
+
+/* upload custom wallpaper */
+.upload-wall-btn {
+  width: 100%; padding: 8px 12px; border-radius: 10px; font-size: 12px;
+  background: rgba(255,255,255,0.05); border: 1.5px dashed rgba(255,255,255,0.15);
+  color: var(--muted); cursor: pointer; font-family: 'Figtree', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 7px; transition: all 0.15s;
+}
+.upload-wall-btn:hover { border-color: rgba(200,150,255,0.5); color: #e0c8ff; background: rgba(200,150,255,0.06); }
 
 /* ── EDIT BANNER ── */
 .edit-banner {
@@ -243,29 +355,29 @@ body.edit-mode .edit-banner { display: flex; }
 }
 .overlay.open { display: flex; }
 .modal {
-  background: #1e1028; border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 18px; padding: 26px; width: 420px; max-width: 96vw;
-  animation: popIn 0.2s ease;
+  background: #170e22; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 26px; width: 430px; max-width: 96vw;
+  animation: popIn 0.2s ease; max-height: 90vh; overflow-y: auto;
 }
 .modal h2 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 400; margin-bottom: 18px; }
 .m-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 5px; display: block; }
 .m-inp {
   width: 100%; padding: 9px 13px; background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text);
   font-family: 'Figtree', sans-serif; font-size: 13.5px; outline: none; margin-bottom: 13px;
   transition: border-color 0.2s;
 }
 .m-inp:focus { border-color: rgba(200,150,255,0.5); }
 .modal-btns { display: flex; gap: 9px; margin-top: 16px; }
 .btn-p {
-  flex: 1; padding: 10px; border-radius: 9px;
+  flex: 1; padding: 10px; border-radius: 10px;
   background: rgba(200,150,255,0.22); border: 1px solid rgba(200,150,255,0.3);
   color: #f0e0ff; font-family: 'Figtree', sans-serif; font-size: 13.5px; font-weight: 600;
   cursor: pointer; transition: all 0.15s;
 }
 .btn-p:hover { background: rgba(200,150,255,0.32); }
 .btn-c {
-  flex: 1; padding: 10px; border-radius: 9px;
+  flex: 1; padding: 10px; border-radius: 10px;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
   color: var(--muted); font-family: 'Figtree', sans-serif; font-size: 13.5px;
   cursor: pointer; transition: all 0.15s;
@@ -277,20 +389,17 @@ body.edit-mode .edit-banner { display: flex; }
 .icon-search-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
 .icon-search {
   flex: 1; padding: 8px 12px; background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12); border-radius: 9px; color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; color: var(--text);
   font-family: 'Figtree', sans-serif; font-size: 13px; outline: none;
 }
 .icon-search:focus { border-color: rgba(200,150,255,0.5); }
 .icon-search::placeholder { color: var(--muted); }
-
-/* currently selected icon preview */
 .icon-selected-preview {
   width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
   background: rgba(200,150,255,0.15); border: 1.5px solid rgba(200,150,255,0.4);
   display: flex; align-items: center; justify-content: center;
 }
 .icon-selected-preview i { font-size: 20px; color: #e0c8ff; }
-
 .icon-cats { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 9px; }
 .icon-cat-btn {
   padding: 3px 10px; border-radius: 20px; font-size: 11px;
@@ -299,14 +408,12 @@ body.edit-mode .edit-banner { display: flex; }
   font-family: 'Figtree', sans-serif;
 }
 .icon-cat-btn.active { background: rgba(200,150,255,0.2); border-color: rgba(200,150,255,0.4); color: #e0c8ff; }
-
 .icon-grid {
   display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px;
-  max-height: 200px; overflow-y: auto; padding-right: 2px;
+  max-height: 220px; overflow-y: auto; padding-right: 2px;
 }
 .icon-grid::-webkit-scrollbar { width: 4px; }
 .icon-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-
 .icon-opt {
   width: 100%; aspect-ratio: 1; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
@@ -322,7 +429,7 @@ body.edit-mode .edit-banner { display: flex; }
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(10px);
-  background: rgba(40,25,50,0.95); border: 1px solid rgba(200,150,255,0.3);
+  background: rgba(30,18,42,0.96); border: 1px solid rgba(200,150,255,0.3);
   backdrop-filter: blur(12px); border-radius: 10px;
   padding: 10px 18px; font-size: 13px; color: var(--text);
   z-index: 300; opacity: 0; transition: all 0.3s ease; pointer-events: none;
@@ -330,12 +437,13 @@ body.edit-mode .edit-banner { display: flex; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
-@keyframes popIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:none; } }
+@keyframes popIn { from { opacity:0; transform:scale(0.93); } to { opacity:1; transform:none; } }
 </style>
 </head>
 <body>
 
-<div class="bg-canvas"></div>
+<div class="bg-canvas" id="bg-canvas"></div>
+<div class="wallpaper-dim" id="wallpaper-dim"></div>
 <div class="globe"></div>
 <div class="grain"></div>
 
@@ -359,13 +467,15 @@ body.edit-mode .edit-banner { display: flex; }
   <div class="app-grid" id="app-grid"></div>
 </div>
 
-<!-- SETTINGS -->
+<!-- ═══════════ SETTINGS PANEL ═══════════ -->
 <div class="settings-panel" id="settings-panel">
   <div class="settings-header">
-    <h3><i class="ri-settings-3-line" style="margin-right:7px;font-size:15px;opacity:0.7"></i>Settings</h3>
+    <h3><i class="ri-settings-3-line" style="opacity:0.6;font-size:15px"></i> Settings</h3>
     <button class="close-settings-btn" id="close-settings-btn"><i class="ri-close-line"></i></button>
   </div>
   <div class="settings-body">
+
+    <!-- NAME -->
     <div>
       <div class="s-lbl">Your Name</div>
       <div class="s-row">
@@ -373,6 +483,8 @@ body.edit-mode .edit-banner { display: flex; }
         <button class="s-btn" id="save-name">Save</button>
       </div>
     </div>
+
+    <!-- SEARCH ENGINE -->
     <div>
       <div class="s-lbl">Search Engine</div>
       <select class="s-inp" id="engine-sel">
@@ -382,16 +494,62 @@ body.edit-mode .edit-banner { display: flex; }
         <option value="https://bing.com/search?q=">Bing</option>
       </select>
     </div>
+
+    <!-- GRADIENT THEME -->
     <div>
-      <div class="s-lbl">Theme</div>
+      <div class="s-lbl">Gradient Theme</div>
       <div class="theme-grid">
-        <div class="t-sw" data-theme="default" style="background:linear-gradient(135deg,#3a2540,#7a3a8a)"></div>
-        <div class="t-sw" data-theme="midnight" style="background:linear-gradient(135deg,#0d0d2a,#2a2a7a)"></div>
-        <div class="t-sw" data-theme="forest" style="background:linear-gradient(135deg,#0a1a0d,#2a7a3a)"></div>
-        <div class="t-sw" data-theme="dusk" style="background:linear-gradient(135deg,#1a1010,#8a3030)"></div>
-        <div class="t-sw" data-theme="ocean" style="background:linear-gradient(135deg,#05101a,#1a5a8a)"></div>
+        <div class="t-sw" data-theme="default"  style="background:linear-gradient(135deg,#3a2540,#7a3a8a)" title="Purple"></div>
+        <div class="t-sw" data-theme="midnight" style="background:linear-gradient(135deg,#0d0d2a,#2a2a7a)" title="Midnight"></div>
+        <div class="t-sw" data-theme="forest"   style="background:linear-gradient(135deg,#0a1a0d,#2a7a3a)" title="Forest"></div>
+        <div class="t-sw" data-theme="dusk"     style="background:linear-gradient(135deg,#1a1010,#8a3030)" title="Dusk"></div>
+        <div class="t-sw" data-theme="ocean"    style="background:linear-gradient(135deg,#05101a,#1a5a8a)" title="Ocean"></div>
       </div>
     </div>
+
+    <!-- ── COLOR + WALLPAPER ── -->
+    <div>
+      <div class="s-lbl">Background</div>
+      <div class="m3-segment" id="bg-segment">
+        <button class="m3-seg-btn active" data-panel="color-panel">Color</button>
+        <button class="m3-seg-btn" data-panel="wallpaper-panel">Wallpaper</button>
+      </div>
+
+
+
+        <!-- Custom color picker -->
+        <div class="m3-custom-row">
+          <input type="color" class="m3-color-input" id="custom-color-input" value="#7c4dff" />
+          <div class="m3-custom-info">
+            <p>Custom Color</p>
+            <span id="custom-color-hex">#7c4dff</span>
+          </div>
+          <button class="m3-use-btn" id="use-custom-color">Apply</button>
+        </div>
+      </div>
+
+      <!-- WALLPAPER PANEL -->
+      <div class="m3-tab-panel" id="wallpaper-panel" style="margin-top:12px">
+        <div class="wallpaper-grid" id="wallpaper-grid">
+          <!-- Filled by JS from /Images/ folder -->
+        </div>
+
+        <!-- dim slider (only shown when wallpaper active) -->
+        <div class="dim-row" id="dim-row" style="margin-bottom:10px">
+          <label><i class="ri-contrast-2-line" style="margin-right:4px"></i>Dim</label>
+          <input type="range" class="m3-slider" id="dim-slider" min="0" max="80" value="35" />
+          <span class="dim-val" id="dim-val">35%</span>
+        </div>
+
+        <!-- Upload custom -->
+        <button class="upload-wall-btn" id="upload-wall-btn">
+          <i class="ri-image-add-line"></i> Upload Custom Wallpaper
+        </button>
+        <input type="file" id="wall-upload-input" accept="image/*" style="display:none">
+      </div>
+    </div>
+
+    <!-- BOOKMARKS EXPORT/IMPORT -->
     <div>
       <div class="s-lbl">Bookmarks</div>
       <div class="io-row">
@@ -400,8 +558,12 @@ body.edit-mode .edit-banner { display: flex; }
       </div>
       <input type="file" id="import-file-input" accept=".json" style="display:none">
     </div>
+
   </div>
-  <div class="settings-footer">Data stored locally in your browser.<br>Drag tabs &amp; apps to reorder. Right-click tabs to delete.</div>
+  <div class="settings-footer">
+    Data stored locally in your browser.<br>
+    Drag tabs &amp; apps to reorder · Right-click tab to delete
+  </div>
 </div>
 
 <!-- EDIT BANNER -->
@@ -418,10 +580,10 @@ body.edit-mode .edit-banner { display: flex; }
     <input class="m-inp" id="app-name" placeholder="e.g. Figma" />
     <label class="m-lbl">URL</label>
     <input class="m-inp" id="app-url" placeholder="https://figma.com" />
-    <label class="m-lbl">Icon — <span style="color:rgba(200,150,255,0.8);font-size:10px">Search or browse below</span></label>
+    <label class="m-lbl">Icon — <span style="color:rgba(200,150,255,0.7);font-size:10px">Search or browse 500+ icons</span></label>
     <div class="icon-picker-wrap">
       <div class="icon-search-row">
-        <input class="icon-search" id="icon-search" placeholder="Search icons... e.g. mail, star, home" />
+        <input class="icon-search" id="icon-search" placeholder="Search icons... e.g. mail, star, rocket" />
         <div class="icon-selected-preview" id="icon-preview"><i class="ri-global-line" id="icon-preview-i"></i></div>
       </div>
       <div class="icon-cats" id="icon-cats"></div>
@@ -450,205 +612,366 @@ body.edit-mode .edit-banner { display: flex; }
 <div class="toast" id="toast"></div>
 
 <script>
-// ── REMIX ICON LIBRARY ──
-// Organized by category: [category, [icon-names...]]
+// ════════════════════════════════════════════
+//  ICON LIBRARY — 500+ Remix Icons organized
+// ════════════════════════════════════════════
 const RI_CATS = {
-  'Common': ['global-line','home-line','search-line','star-line','heart-line','bookmark-line','settings-line','user-line','mail-line','notification-line','time-line','calendar-line','map-pin-line','link','share-line','eye-line','lock-line','key-line','shield-line','alarm-line'],
-  'Social': ['twitter-x-line','instagram-line','facebook-line','youtube-line','github-line','linkedin-line','discord-line','slack-line','telegram-line','whatsapp-line','tiktok-line','reddit-line','twitch-line','pinterest-line','snapchat-line','spotify-line','soundcloud-line','medium-line','dribbble-line','behance-line'],
-  'Media': ['play-circle-line','music-line','video-line','film-line','image-line','camera-line','headphone-line','mic-line','volume-up-line','live-line','tv-line','netflix-line','movie-line','gallery-line','slideshow-line','podcast-line','broadcast-line','radio-line','record-circle-line','shuffle-line'],
-  'Work': ['briefcase-line','building-line','team-line','presentation-line','bar-chart-line','line-chart-line','pie-chart-line','file-text-line','folder-line','archive-line','printer-line','clipboard-line','task-line','todo-line','kanban-view','flow-chart','organization-chart','survey-line','draft-line','article-line'],
-  'Tech': ['code-line','terminal-line','database-line','server-line','cloud-line','wifi-line','cpu-line','hard-drive-line','smartphone-line','tablet-line','computer-line','keyboard-line','mouse-line','usb-line','bluetooth-line','bug-line','git-branch-line','git-commit-line','git-pull-request-line','robot-line'],
-  'Finance': ['money-dollar-circle-line','bank-line','wallet-line','exchange-dollar-line','stock-line','fund-line','safe-line','coins-line','coupon-line','price-tag-line','shopping-bag-line','shopping-cart-line','store-line','vip-crown-line','trophy-line','medal-line','gift-line','percent-line','calculator-line','receipt-line'],
-  'Travel': ['plane-line','car-line','train-line','bus-line','ship-line','compass-line','map-line','map-pin-2-line','earth-line','hotel-line','restaurant-line','cup-line','luggage-cart-line','road-map-line','gas-station-line','parking-line','ride-line','flight-takeoff-line','flight-land-line','navigation-line'],
-  'Health': ['heart-pulse-line','mental-health-line','medicine-bottle-line','nurse-line','hospital-line','stethoscope-line','dna-line','capsule-line','thermometer-line','first-aid-kit-line','eye-line','tooth-line','lungs-line','brain-line','run-line','walk-line','bike-line','swimming-line','yoga-line','apple-line'],
-  'Design': ['palette-line','brush-line','pen-nib-line','pencil-line','magic-line','scissors-line','ruler-line','crop-line','contrast-line','sun-line','moon-line','blur-off-line','artboard-line','shape-line','polygon-line','drag-move-line','focus-line','align-center','grid-line','layout-line'],
-  'Misc': ['rocket-line','fire-line','leaf-line','plant-line','thunderstorms-line','snowflake-line','sun-cloudy-line','gamepad-line','sword-line','robot-2-line','alien-line','ghost-line','skull-line','flask-line','test-tube-line','microscope-line','telescope-line','anchor-line','lighthouse-line','castle-line'],
+  'Common':   ['global-line','home-line','home-2-line','search-line','star-line','star-fill','heart-line','heart-fill','bookmark-line','bookmark-fill','settings-line','settings-3-line','user-line','user-3-line','user-star-line','mail-line','mail-open-line','send-plane-line','notification-line','notification-2-line','time-line','calendar-line','calendar-2-line','map-pin-line','map-pin-2-line','link','links-line','share-line','share-forward-line','eye-line','eye-off-line','lock-line','lock-2-line','unlock-line','key-line','shield-line','shield-check-line','alarm-line','bell-line','bell-fill','thumb-up-line','thumb-down-line','flag-line','award-line','gift-line','lightbulb-line','question-line','information-line','error-warning-line','check-line','close-line','add-line','subtract-line'],
+  'Social':   ['twitter-x-line','twitter-x-fill','instagram-line','instagram-fill','facebook-line','facebook-fill','youtube-line','youtube-fill','github-line','github-fill','linkedin-line','linkedin-fill','discord-line','discord-fill','slack-line','telegram-line','telegram-fill','whatsapp-line','whatsapp-fill','tiktok-line','tiktok-fill','reddit-line','reddit-fill','twitch-line','twitch-fill','pinterest-line','snapchat-line','spotify-line','spotify-fill','soundcloud-line','medium-line','dribbble-line','behance-line','figma-line','notion-line','mastodon-line','bluesky-line','threads-line','wechat-line','line-line'],
+  'Media':    ['play-circle-line','play-circle-fill','pause-circle-line','stop-circle-line','music-line','music-2-line','music-fill','video-line','video-add-line','film-line','film-fill','image-line','image-2-line','camera-line','camera-2-line','camera-fill','headphone-line','headphone-fill','mic-line','mic-2-line','volume-up-line','volume-mute-line','live-line','tv-line','tv-2-line','netflix-line','movie-line','movie-2-line','gallery-line','gallery-fill','slideshow-line','podcast-line','broadcast-line','radio-line','record-circle-line','shuffle-line','repeat-line','skip-forward-line','skip-back-line','equalizer-line','vidicon-line','4k-line','hd-line'],
+  'Work':     ['briefcase-line','briefcase-2-line','briefcase-fill','building-line','building-2-line','building-3-line','building-4-line','team-line','group-line','presentation-line','bar-chart-line','bar-chart-2-line','line-chart-line','pie-chart-line','pie-chart-2-line','file-text-line','file-word-line','file-excel-line','file-pdf-line','file-ppt-line','folder-line','folder-2-line','folder-fill','archive-line','archive-2-line','printer-line','clipboard-line','clipboard-fill','task-line','todo-line','kanban-view','survey-line','draft-line','article-line','mail-send-line','customer-service-line','contacts-line','user-add-line','user-settings-line','organization-chart','flow-chart','mind-map','table-line','grid-line'],
+  'Tech':     ['code-line','code-s-line','code-s-slash-line','terminal-line','terminal-box-line','database-line','database-2-line','server-line','server-2-line','cloud-line','cloud-fill','wifi-line','wifi-off-line','cpu-line','cpu-fill','hard-drive-line','hard-drive-2-line','smartphone-line','smartphone-fill','tablet-line','computer-line','mac-line','keyboard-line','mouse-line','usb-line','bluetooth-line','bug-line','bug-2-line','git-branch-line','git-commit-line','git-pull-request-line','git-merge-line','git-repository-line','robot-line','robot-2-line','ai-line','ai-generate','openai-line','braces-line','brackets-line','stackshare-line','apps-line','apps-2-line','plug-line','plug-2-line','puzzle-line'],
+  'Finance':  ['money-dollar-circle-line','money-dollar-circle-fill','bank-line','bank-fill','wallet-line','wallet-2-line','wallet-3-line','exchange-dollar-line','stock-line','fund-line','safe-line','coins-line','coin-line','coupon-line','price-tag-line','price-tag-2-line','shopping-bag-line','shopping-bag-fill','shopping-cart-line','shopping-cart-fill','store-line','store-2-line','vip-crown-line','vip-diamond-line','trophy-line','trophy-fill','medal-line','medal-2-line','gift-line','gift-fill','percent-line','calculator-line','receipt-line','receipt-2-line','bill-line','mastercard-line','visa-line','paypal-line','alipay-line','amazon-line'],
+  'Travel':   ['plane-line','plane-fill','flight-takeoff-line','flight-land-line','car-line','car-fill','car-washing-line','train-line','train-fill','bus-line','ship-line','ship-2-line','compass-line','compass-2-line','compass-3-line','map-line','map-2-line','navigation-line','navigation-fill','earth-line','earth-fill','hotel-line','restaurant-line','restaurant-fill','cup-line','coffee-line','gas-station-line','parking-line','road-map-line','luggage-cart-line','suitcase-line','ticket-line','ticket-2-line','riding-line','riding-fill','walk-line','run-line','bike-line','sailboat-line','rocket-line','rocket-2-line'],
+  'Health':   ['heart-pulse-line','heart-pulse-fill','mental-health-line','medicine-bottle-line','nurse-line','hospital-line','stethoscope-line','stethoscope-fill','dna-line','capsule-line','thermometer-line','first-aid-kit-line','eye-line','tooth-line','brain-line','lungs-line','apple-line','leaf-line','plant-line','seedling-line','yoga-line','swimming-line','boxing-line','football-line','basketball-line','volleyball-line','ping-pong-line','tennis-line','star-smile-line','emotion-line','emotion-happy-line','emotion-sad-line','emotion-laugh-line','sun-line','moon-line','rainy-line','drop-line','water-flash-line','fire-line','snowy-line'],
+  'Design':   ['palette-line','palette-fill','brush-line','brush-2-line','brush-3-line','brush-4-line','pen-nib-line','pen-nib-fill','pencil-line','pencil-fill','magic-line','magic-fill','scissors-line','scissors-cut-line','ruler-line','crop-line','contrast-line','contrast-2-line','focus-line','blur-off-line','artboard-line','artboard-2-line','shape-line','polygon-line','drag-move-line','drag-move-2-line','layout-line','layout-2-line','layout-3-line','layout-4-line','grid-line','stack-line','layers-line','layers-fill','compasses-line','compasses-2-line','quill-pen-line','ink-bottle-line','paint-brush-line','paint-fill','drop-line','syringe-line','eraser-line','format-clear','text-wrap','space'],
+  'Misc':     ['fire-line','fire-fill','leaf-line','plant-line','thunderstorms-line','snowflake-line','sun-cloudy-line','gamepad-line','gamepad-fill','joystick-line','sword-line','shield-star-line','alien-line','ghost-line','skull-line','skull-2-line','flask-line','test-tube-line','microscope-line','telescope-line','anchor-line','lighthouse-line','castle-line','building-line','home-wifi-line','fingerprint-line','fingerprint-2-line','vip-line','vip-fill','verified-badge-line','medal-line','trophy-line','crown-line','crown-fill','diamond-line','diamond-fill','donut-chart-line','bubble-chart-line','scatter-chart-line','focus-2-line','crosshair-line','crosshair-2-line','cursor-line','hand-coin-line','hand-heart-line','hand-plant-line'],
+  'Arrows':   ['arrow-left-line','arrow-right-line','arrow-up-line','arrow-down-line','arrow-left-right-line','arrow-up-down-line','arrows-left-right-line','corner-down-left-line','corner-down-right-line','corner-left-down-line','corner-right-down-line','refresh-line','refresh-fill','loop-left-line','loop-right-line','repeat-one-line','shuffle-line','drag-move-line','expand-left-line','expand-right-line','skip-forward-line','skip-back-line','rewind-line','fast-forward-line','upload-line','download-line','upload-cloud-line','download-cloud-line','share-box-line','external-link-line','login-box-line','logout-box-line'],
+  'UI':       ['menu-line','menu-2-line','menu-3-line','menu-4-line','close-line','add-line','subtract-line','checkbox-line','checkbox-fill','radio-button-line','toggle-line','switch-line','slider-line','input-cursor-move','cursor-line','hand-line','drag-drop-line','zoom-in-line','zoom-out-line','search-line','filter-line','filter-2-line','filter-3-line','sort-asc','sort-desc','list-check-line','list-ordered','list-unordered','indent-increase','indent-decrease','function-line','formula','hashtag','at-line','more-line','more-2-line','loader-line','loader-2-line','refresh-line','time-line','hourglass-line'],
 };
 
-const ALL_ICONS = Object.entries(RI_CATS).flatMap(([cat, icons]) => icons.map(i => ({name: i, cat})));
+const ALL_ICONS = Object.entries(RI_CATS).flatMap(([cat,icons]) => icons.map(n=>({name:n,cat})));
 
-// ── DATA ──
+// ════════════════════════════════════════════
+//  WALLPAPERS — files from /Images/ folder
+// ════════════════════════════════════════════
+const WALLPAPERS = [
+  'Images/wp1.jpg','Images/wp2.jpg','Images/wp3.jpg','Images/wp4.jpg',
+  'Images/wp5.jpg','Images/wp6.jpg','Images/wp7.jpg','Images/wp8.jpg',
+  'Images/wp9.jpg','Images/wp10.jpg','Images/wp11.jpg','Images/wp12.jpg',
+];
+
+// M3 Color presets (same as swatches)
+const M3_COLORS = [
+  '#7c4dff','#9c27b0','#673ab7','#e040fb','#6200ea','#4a148c',
+  '#1565c0','#0288d1','#006064','#01579b','#00838f','#0d47a1',
+  '#1b5e20','#2e7d32','#00695c','#33691e','#388e3c','#004d40',
+  '#b71c1c','#c62828','#e65100','#bf360c','#f57f17','#4e342e',
+  '#212121','#263238','#1a237e','#37474f','#1c1c2e','#0a0a0a',
+];
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
 const DEF = {
-  name: 'Inferno', activeTab: 'recent', theme: 'default',
+  name: 'Jonathan', activeTab: 'recent', theme: 'default',
   engine: 'https://google.com/search?q=',
+  bgType: 'gradient',   // 'gradient' | 'color' | 'wallpaper'
+  bgColor: null,        // hex string when bgType='color'
+  bgWallpaper: null,    // path or data-url when bgType='wallpaper'
+  wallpaperDim: 35,
   tabs: [{id:'recent',name:'Recently Used'},{id:'personal',name:'Personal'},{id:'work',name:'Work'}],
   apps: {
     recent: [
-      {id:'g',name:'Google',url:'https://google.com',icon:'ri-global-line'},
-      {id:'yt',name:'YouTube',url:'https://youtube.com',icon:'ri-youtube-line'},
-      {id:'gh',name:'GitHub',url:'https://github.com',icon:'ri-github-line'},
-      {id:'gm',name:'Gmail',url:'https://mail.google.com',icon:'ri-mail-line'},
-      {id:'sl',name:'Slack',url:'https://slack.com',icon:'ri-slack-line'},
-      {id:'sp',name:'Spotify',url:'https://spotify.com',icon:'ri-spotify-line'},
-      {id:'nt',name:'Notion',url:'https://notion.so',icon:'ri-file-text-line'},
-      {id:'rd',name:'Reddit',url:'https://reddit.com',icon:'ri-reddit-line'},
+      {id:'g',  name:'Google',   url:'https://google.com',         icon:'ri-global-line'},
+      {id:'yt', name:'YouTube',  url:'https://youtube.com',        icon:'ri-youtube-line'},
+      {id:'gh', name:'GitHub',   url:'https://github.com',         icon:'ri-github-line'},
+      {id:'gm', name:'Gmail',    url:'https://mail.google.com',    icon:'ri-mail-line'},
+      {id:'sl', name:'Slack',    url:'https://slack.com',          icon:'ri-slack-line'},
+      {id:'sp', name:'Spotify',  url:'https://spotify.com',        icon:'ri-spotify-line'},
+      {id:'nt', name:'Notion',   url:'https://notion.so',          icon:'ri-file-text-line'},
+      {id:'rd', name:'Reddit',   url:'https://reddit.com',         icon:'ri-reddit-line'},
     ],
     personal: [
-      {id:'ig',name:'Instagram',url:'https://instagram.com',icon:'ri-instagram-line'},
-      {id:'tw',name:'Twitter',url:'https://twitter.com',icon:'ri-twitter-x-line'},
-      {id:'nf',name:'Netflix',url:'https://netflix.com',icon:'ri-netflix-line'},
+      {id:'ig', name:'Instagram',url:'https://instagram.com',      icon:'ri-instagram-line'},
+      {id:'tw', name:'Twitter',  url:'https://twitter.com',        icon:'ri-twitter-x-line'},
+      {id:'nf', name:'Netflix',  url:'https://netflix.com',        icon:'ri-netflix-line'},
     ],
     work: [
-      {id:'gh2',name:'GitHub',url:'https://github.com',icon:'ri-github-line'},
-      {id:'lk',name:'LinkedIn',url:'https://linkedin.com',icon:'ri-linkedin-line'},
-      {id:'fig',name:'Figma',url:'https://figma.com',icon:'ri-pen-nib-line'},
-      {id:'gd',name:'Drive',url:'https://drive.google.com',icon:'ri-cloud-line'},
+      {id:'gh2',name:'GitHub',   url:'https://github.com',         icon:'ri-github-line'},
+      {id:'lk', name:'LinkedIn', url:'https://linkedin.com',       icon:'ri-linkedin-line'},
+      {id:'fig',name:'Figma',    url:'https://figma.com',          icon:'ri-pen-nib-line'},
+      {id:'gd', name:'Drive',    url:'https://drive.google.com',   icon:'ri-cloud-line'},
     ]
   }
 };
 
-let S = (() => { try { return JSON.parse(localStorage.getItem('nt_v4')||'null')||JSON.parse(JSON.stringify(DEF)); } catch(e) { return JSON.parse(JSON.stringify(DEF)); }})();
-const save = () => localStorage.setItem('nt_v4', JSON.stringify(S));
+let S = (() => {
+  try { return JSON.parse(localStorage.getItem('nt_v5')||'null')||JSON.parse(JSON.stringify(DEF)); }
+  catch(e) { return JSON.parse(JSON.stringify(DEF)); }
+})();
+const save = () => localStorage.setItem('nt_v5', JSON.stringify(S));
 
 // ── TOAST ──
 let toastTimer;
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
 // ── CLOCK 12HR ──
 function tick() {
-  const n = new Date(); let h = n.getHours();
-  const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
-  document.getElementById('clock').textContent = `${h}:${n.getMinutes().toString().padStart(2,'0')} ${ampm}`;
+  const n=new Date(); let h=n.getHours();
+  const ampm=h>=12?'PM':'AM'; h=h%12||12;
+  document.getElementById('clock').textContent=`${h}:${n.getMinutes().toString().padStart(2,'0')} ${ampm}`;
 }
-tick(); setInterval(tick, 10000);
+tick(); setInterval(tick,10000);
 
 // ── GREETING ──
 function setGreeting() {
-  const h = new Date().getHours();
-  const g = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-  document.getElementById('greeting').textContent = `${g}, ${S.name}`;
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('greeting').textContent=`${g}, ${S.name}`;
 }
 
-// ── THEME ──
+// ── GRADIENT THEME ──
 function applyTheme(t) {
-  if (t==='default') document.body.removeAttribute('data-theme');
-  else document.body.setAttribute('data-theme', t);
-  document.querySelectorAll('.t-sw').forEach(s => s.classList.toggle('active', s.dataset.theme===t));
+  if(t==='default') document.body.removeAttribute('data-theme');
+  else document.body.setAttribute('data-theme',t);
+  document.querySelectorAll('.t-sw').forEach(s=>s.classList.toggle('active',s.dataset.theme===t));
 }
 
 // ── ENGINE BADGE ──
-const ENGINE_BADGES = {'google':'G','duckduckgo':'D','brave':'B','bing':'Ⓑ'};
+const ENGINE_BADGES={'google':'G','duckduckgo':'D','brave':'B','bing':'Ⓑ'};
 function updateBadge() {
-  const k = Object.keys(ENGINE_BADGES).find(k => S.engine.includes(k))||'google';
-  document.getElementById('engine-pill').textContent = ENGINE_BADGES[k];
+  const k=Object.keys(ENGINE_BADGES).find(k=>S.engine.includes(k))||'google';
+  document.getElementById('engine-pill').textContent=ENGINE_BADGES[k];
 }
 
-// ── ICON PICKER ──
-let selIcon = 'ri-global-line';
-let activeIconCat = 'Common';
-let iconSearchVal = '';
+// ════════════════════════════════════════════
+//  BACKGROUND: COLOR + WALLPAPER
+// ════════════════════════════════════════════
+function applyBackground() {
+  const canvas=document.getElementById('bg-canvas');
+  if(S.bgType==='color' && S.bgColor) {
+    // color gradient — darken the picked color for a rich bg
+    canvas.style.background=`radial-gradient(ellipse 120% 120% at 60% 40%, ${S.bgColor}cc 0%, ${S.bgColor}88 40%, ${adjustBrightness(S.bgColor,-60)} 100%)`;
+    document.body.removeAttribute('data-theme');
+    document.body.classList.remove('has-wallpaper');
+  } else if(S.bgType==='wallpaper' && S.bgWallpaper) {
+    canvas.style.background=`url('${S.bgWallpaper}') center/cover no-repeat`;
+    document.body.classList.add('has-wallpaper');
+    document.body.removeAttribute('data-theme');
+    // apply dim
+    const pct=(S.wallpaperDim||35)/100;
+    document.documentElement.style.setProperty('--wallpaper-dim', pct);
+  } else {
+    // gradient theme — clear inline styles
+    canvas.style.background='';
+    document.body.classList.remove('has-wallpaper');
+    applyTheme(S.theme);
+  }
+  // sync swatch active states
+  syncColorSwatches();
+  syncWallpaperThumbs();
+}
+
+function adjustBrightness(hex, amt) {
+  let r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  r=Math.max(0,Math.min(255,r+amt)); g=Math.max(0,Math.min(255,g+amt)); b=Math.max(0,Math.min(255,b+amt));
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+function syncColorSwatches() {
+  document.querySelectorAll('.m3-swatch').forEach(s=>{
+    s.classList.toggle('active', S.bgType==='color' && S.bgColor===s.dataset.color);
+  });
+}
+
+function syncWallpaperThumbs() {
+  document.querySelectorAll('.wp-thumb,.wp-none').forEach(el=>{
+    const isNone=el.classList.contains('wp-none');
+    if(isNone) el.classList.toggle('active', S.bgType!=='wallpaper');
+    else el.classList.toggle('active', S.bgType==='wallpaper' && S.bgWallpaper===el.dataset.src);
+  });
+}
+
+// ── M3 SEGMENT SWITCHER ──
+document.querySelectorAll('.m3-seg-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.m3-seg-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.m3-tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
+  };
+});
+
+// ── COLOR SWATCHES ──
+document.querySelectorAll('.m3-swatch').forEach(s=>{
+  s.onclick=()=>{
+    S.bgType='color'; S.bgColor=s.dataset.color; S.bgWallpaper=null;
+    save(); applyBackground(); showToast('✓ Color applied');
+  };
+});
+
+// ── CUSTOM COLOR ──
+const customColorInput=document.getElementById('custom-color-input');
+customColorInput.oninput=()=>{
+  document.getElementById('custom-color-hex').textContent=customColorInput.value;
+};
+document.getElementById('use-custom-color').onclick=()=>{
+  S.bgType='color'; S.bgColor=customColorInput.value; S.bgWallpaper=null;
+  save(); applyBackground(); showToast('✓ Custom color applied');
+};
+
+// ── WALLPAPER GRID ──
+function buildWallpaperGrid() {
+  const grid=document.getElementById('wallpaper-grid');
+  grid.innerHTML='';
+
+  // "None" option
+  const none=document.createElement('div');
+  none.className='wp-none'+(S.bgType!=='wallpaper'?' active':'');
+  none.innerHTML='<i class="ri-layout-grid-line"></i><span>Use gradient theme</span>';
+  none.onclick=()=>{
+    S.bgType='gradient'; S.bgWallpaper=null;
+    save(); applyBackground(); applyTheme(S.theme); showToast('✓ Gradient restored');
+  };
+  grid.appendChild(none);
+
+  // Preset wallpapers from /Images/
+  WALLPAPERS.forEach(src=>{
+    const thumb=document.createElement('div');
+    thumb.className='wp-thumb'+(S.bgType==='wallpaper'&&S.bgWallpaper===src?' active':'');
+    thumb.dataset.src=src;
+    const img=document.createElement('img');
+    img.src=src; img.alt='Wallpaper'; img.onerror=()=>{ thumb.style.display='none'; };
+    thumb.appendChild(img);
+    thumb.onclick=()=>{
+      S.bgType='wallpaper'; S.bgWallpaper=src;
+      save(); applyBackground(); showToast('✓ Wallpaper set');
+    };
+    grid.appendChild(thumb);
+  });
+
+  // If user has a custom uploaded wallpaper not in preset list
+  if(S.bgType==='wallpaper' && S.bgWallpaper && S.bgWallpaper.startsWith('data:')) {
+    const cThumb=document.createElement('div');
+    cThumb.className='wp-thumb active'; cThumb.dataset.src=S.bgWallpaper;
+    cThumb.innerHTML=`<img src="${S.bgWallpaper}" alt="Custom" style="width:100%;height:100%;object-fit:cover">`;
+    cThumb.onclick=()=>{ S.bgType='wallpaper'; S.bgWallpaper=S.bgWallpaper; save(); applyBackground(); };
+    grid.appendChild(cThumb);
+  }
+}
+
+// ── DIM SLIDER ──
+const dimSlider=document.getElementById('dim-slider');
+const dimVal=document.getElementById('dim-val');
+dimSlider.value=S.wallpaperDim||35;
+dimVal.textContent=(S.wallpaperDim||35)+'%';
+dimSlider.oninput=()=>{
+  S.wallpaperDim=parseInt(dimSlider.value);
+  dimVal.textContent=S.wallpaperDim+'%';
+  document.documentElement.style.setProperty('--wallpaper-dim', S.wallpaperDim/100);
+  save();
+};
+
+// ── UPLOAD CUSTOM WALLPAPER ──
+document.getElementById('upload-wall-btn').onclick=()=>document.getElementById('wall-upload-input').click();
+document.getElementById('wall-upload-input').onchange=e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    S.bgType='wallpaper'; S.bgWallpaper=ev.target.result;
+    save(); buildWallpaperGrid(); applyBackground(); showToast('✓ Custom wallpaper applied');
+  };
+  reader.readAsDataURL(file); e.target.value='';
+};
+
+// ════════════════════════════════════════════
+//  ICON PICKER
+// ════════════════════════════════════════════
+let selIcon='ri-global-line', activeIconCat='Common', iconSearchVal='';
 
 function buildIconPicker() {
-  // Categories
-  const catWrap = document.getElementById('icon-cats');
-  catWrap.innerHTML = '';
-  ['All', ...Object.keys(RI_CATS)].forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'icon-cat-btn' + (activeIconCat === cat ? ' active' : '');
-    btn.textContent = cat;
-    btn.onclick = () => { activeIconCat = cat; buildIconGrid(); catWrap.querySelectorAll('.icon-cat-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
+  const catWrap=document.getElementById('icon-cats');
+  catWrap.innerHTML='';
+  ['All',...Object.keys(RI_CATS)].forEach(cat=>{
+    const btn=document.createElement('button');
+    btn.className='icon-cat-btn'+(activeIconCat===cat?' active':'');
+    btn.textContent=cat;
+    btn.onclick=()=>{ activeIconCat=cat; buildIconGrid(); catWrap.querySelectorAll('.icon-cat-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
     catWrap.appendChild(btn);
   });
   buildIconGrid();
 }
 
 function buildIconGrid() {
-  const grid = document.getElementById('icon-grid');
-  grid.innerHTML = '';
-  const q = iconSearchVal.toLowerCase();
-  let list = q
-    ? ALL_ICONS.filter(ic => ic.name.includes(q))
-    : (activeIconCat === 'All' ? ALL_ICONS : ALL_ICONS.filter(ic => ic.cat === activeIconCat));
-
-  if (list.length === 0) {
-    grid.innerHTML = '<div style="color:var(--muted);font-size:12px;grid-column:1/-1;padding:12px 0">No icons found</div>';
+  const grid=document.getElementById('icon-grid');
+  grid.innerHTML='';
+  const q=iconSearchVal.toLowerCase();
+  let list=q ? ALL_ICONS.filter(ic=>ic.name.includes(q)||(ic.cat.toLowerCase().includes(q)))
+              : (activeIconCat==='All'?ALL_ICONS:ALL_ICONS.filter(ic=>ic.cat===activeIconCat));
+  if(!list.length) {
+    grid.innerHTML='<div style="color:var(--muted);font-size:12px;grid-column:1/-1;padding:12px 0;text-align:center">No icons found</div>';
     return;
   }
-
-  list.forEach(ic => {
-    const cls = 'ri-' + ic.name;
-    const el = document.createElement('div');
-    el.className = 'icon-opt' + (selIcon === cls ? ' sel' : '');
-    el.title = ic.name.replace(/-/g,' ');
-    el.innerHTML = `<i class="${cls}"></i>`;
-    el.onclick = () => {
-      selIcon = cls;
-      document.getElementById('icon-preview-i').className = cls;
-      grid.querySelectorAll('.icon-opt').forEach(x=>x.classList.remove('sel'));
-      el.classList.add('sel');
-    };
+  list.forEach(ic=>{
+    const cls='ri-'+ic.name;
+    const el=document.createElement('div');
+    el.className='icon-opt'+(selIcon===cls?' sel':'');
+    el.title=ic.name.replace(/-/g,' ');
+    el.innerHTML=`<i class="${cls}"></i>`;
+    el.onclick=()=>{ selIcon=cls; document.getElementById('icon-preview-i').className=cls; grid.querySelectorAll('.icon-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); };
     grid.appendChild(el);
   });
 }
+document.getElementById('icon-search').addEventListener('input',e=>{ iconSearchVal=e.target.value; buildIconGrid(); });
 
-document.getElementById('icon-search').addEventListener('input', e => {
-  iconSearchVal = e.target.value;
-  buildIconGrid();
-});
-
-// ── RENDER TABS (drag reorder) ──
-let dragTabId = null;
+// ════════════════════════════════════════════
+//  RENDER TABS (drag reorder)
+// ════════════════════════════════════════════
+let dragTabId=null;
 function renderTabs() {
-  const bar = document.getElementById('tab-bar');
-  bar.innerHTML = '';
-  S.tabs.forEach(tab => {
-    const btn = document.createElement('button');
-    btn.className = 'tab' + (tab.id===S.activeTab?' active':'');
-    btn.textContent = tab.name; btn.draggable = true; btn.dataset.id = tab.id;
-    btn.onclick = () => { S.activeTab=tab.id; if(!S.apps[tab.id]) S.apps[tab.id]=[]; save(); renderTabs(); renderApps(); };
-    btn.oncontextmenu = e => {
-      e.preventDefault(); if(S.tabs.length<=1) return;
-      if(!confirm(`Delete "${tab.name}"?`)) return;
-      S.tabs = S.tabs.filter(t=>t.id!==tab.id); delete S.apps[tab.id];
-      if(S.activeTab===tab.id) S.activeTab=S.tabs[0].id;
+  const bar=document.getElementById('tab-bar');
+  bar.innerHTML='';
+  S.tabs.forEach(tab=>{
+    const btn=document.createElement('button');
+    btn.className='tab'+(tab.id===S.activeTab?' active':'');
+    btn.textContent=tab.name; btn.draggable=true; btn.dataset.id=tab.id;
+    btn.onclick=()=>{ S.activeTab=tab.id; if(!S.apps[tab.id])S.apps[tab.id]=[]; save(); renderTabs(); renderApps(); };
+    btn.oncontextmenu=e=>{
+      e.preventDefault(); if(S.tabs.length<=1)return;
+      if(!confirm(`Delete "${tab.name}"?`))return;
+      S.tabs=S.tabs.filter(t=>t.id!==tab.id); delete S.apps[tab.id];
+      if(S.activeTab===tab.id)S.activeTab=S.tabs[0].id;
       save(); renderTabs(); renderApps();
     };
-    btn.addEventListener('dragstart', e => { dragTabId=tab.id; btn.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
-    btn.addEventListener('dragend', () => { dragTabId=null; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('dragging','drag-over')); });
-    btn.addEventListener('dragover', e => { if(!dragTabId||dragTabId===tab.id) return; e.preventDefault(); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('drag-over')); btn.classList.add('drag-over'); });
-    btn.addEventListener('dragleave', () => btn.classList.remove('drag-over'));
-    btn.addEventListener('drop', e => {
-      e.preventDefault(); if(!dragTabId||dragTabId===tab.id) return;
+    btn.addEventListener('dragstart',e=>{ dragTabId=tab.id; btn.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    btn.addEventListener('dragend',()=>{ dragTabId=null; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('dragging','drag-over')); });
+    btn.addEventListener('dragover',e=>{ if(!dragTabId||dragTabId===tab.id)return; e.preventDefault(); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('drag-over')); btn.classList.add('drag-over'); });
+    btn.addEventListener('dragleave',()=>btn.classList.remove('drag-over'));
+    btn.addEventListener('drop',e=>{
+      e.preventDefault(); if(!dragTabId||dragTabId===tab.id)return;
       const fi=S.tabs.findIndex(t=>t.id===dragTabId), ti=S.tabs.findIndex(t=>t.id===tab.id);
       const [mv]=S.tabs.splice(fi,1); S.tabs.splice(ti,0,mv);
       save(); renderTabs();
     });
     bar.appendChild(btn);
   });
-  const add = document.createElement('button');
+  const add=document.createElement('button');
   add.className='tab-add-btn'; add.textContent='+'; add.onclick=()=>openTabModal();
   bar.appendChild(add);
 }
 
-// ── RENDER APPS (drag reorder + remix icons) ──
-let dragAppId = null;
+// ════════════════════════════════════════════
+//  RENDER APPS (drag reorder)
+// ════════════════════════════════════════════
+let dragAppId=null;
 function renderApps() {
-  const grid = document.getElementById('app-grid');
-  grid.innerHTML = '';
-  const apps = S.apps[S.activeTab]||[];
-  apps.forEach((app,i) => {
-    const card = document.createElement('a');
+  const grid=document.getElementById('app-grid');
+  grid.innerHTML='';
+  const apps=S.apps[S.activeTab]||[];
+  apps.forEach((app,i)=>{
+    const card=document.createElement('a');
     card.className='app-card'; card.href=app.url; card.draggable=true; card.dataset.id=app.id;
     card.style.animationDelay=`${i*30}ms`;
-    card.innerHTML = `<div class="app-icon"><i class="${app.icon}"></i></div><div class="app-name">${app.name}</div>`;
-    card.addEventListener('click', e => {
-      if(document.body.classList.contains('edit-mode')) {
+    card.innerHTML=`<div class="app-icon"><i class="${app.icon}"></i></div><div class="app-name">${app.name}</div>`;
+    card.addEventListener('click',e=>{
+      if(document.body.classList.contains('edit-mode')){
         e.preventDefault();
         S.apps[S.activeTab]=(S.apps[S.activeTab]||[]).filter(a=>a.id!==app.id);
         save(); renderTabs(); renderApps();
       }
     });
-    card.addEventListener('dragstart', e => { dragAppId=app.id; setTimeout(()=>card.classList.add('dragging'),0); e.dataTransfer.effectAllowed='move'; });
-    card.addEventListener('dragend', () => { dragAppId=null; document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('dragging','drag-over-card')); });
-    card.addEventListener('dragover', e => { if(!dragAppId||dragAppId===app.id) return; e.preventDefault(); document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('drag-over-card')); card.classList.add('drag-over-card'); });
-    card.addEventListener('dragleave', ()=>card.classList.remove('drag-over-card'));
-    card.addEventListener('drop', e => {
-      e.preventDefault(); if(!dragAppId||dragAppId===app.id) return;
+    card.addEventListener('dragstart',e=>{ dragAppId=app.id; setTimeout(()=>card.classList.add('dragging'),0); e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend',()=>{ dragAppId=null; document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('dragging','drag-over-card')); });
+    card.addEventListener('dragover',e=>{ if(!dragAppId||dragAppId===app.id)return; e.preventDefault(); document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('drag-over-card')); card.classList.add('drag-over-card'); });
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over-card'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault(); if(!dragAppId||dragAppId===app.id)return;
       const list=S.apps[S.activeTab];
       const fi=list.findIndex(a=>a.id===dragAppId), ti=list.findIndex(a=>a.id===app.id);
       const [mv]=list.splice(fi,1); list.splice(ti,0,mv);
@@ -656,60 +979,94 @@ function renderApps() {
     });
     grid.appendChild(card);
   });
-  const addCard = document.createElement('div');
+  const addCard=document.createElement('div');
   addCard.className='app-card add-app-card';
   addCard.innerHTML=`<div class="app-icon"><i class="ri-add-line"></i></div><div class="app-name">Add</div>`;
   addCard.onclick=()=>openAppModal();
   grid.appendChild(addCard);
 }
 
-// ── SEARCH ──
-document.getElementById('search-input').addEventListener('keydown', e => {
-  if(e.key!=='Enter') return;
-  const q=e.target.value.trim(); if(!q) return;
+// ════════════════════════════════════════════
+//  SEARCH
+// ════════════════════════════════════════════
+document.getElementById('search-input').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const q=e.target.value.trim(); if(!q)return;
   const isURL=/^https?:\/\//.test(q)||(/\.[a-z]{2,}/.test(q)&&!q.includes(' '));
-  window.location.href = isURL?(q.startsWith('http')?q:'https://'+q):S.engine+encodeURIComponent(q);
+  window.location.href=isURL?(q.startsWith('http')?q:'https://'+q):S.engine+encodeURIComponent(q);
 });
 
-// ── SETTINGS ──
-document.getElementById('settings-btn').onclick = () => document.getElementById('settings-panel').classList.add('open');
-document.getElementById('close-settings-btn').onclick = () => document.getElementById('settings-panel').classList.remove('open');
-document.querySelectorAll('.t-sw').forEach(s => s.onclick=()=>{ S.theme=s.dataset.theme; save(); applyTheme(S.theme); });
-document.getElementById('engine-sel').onchange = e => { S.engine=e.target.value; save(); updateBadge(); };
-document.getElementById('save-name').onclick = () => {
+// ════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════
+document.getElementById('settings-btn').onclick=()=>document.getElementById('settings-panel').classList.add('open');
+document.getElementById('close-settings-btn').onclick=()=>document.getElementById('settings-panel').classList.remove('open');
+document.querySelectorAll('.t-sw').forEach(s=>s.onclick=()=>{
+  S.theme=s.dataset.theme; S.bgType='gradient'; S.bgWallpaper=null; S.bgColor=null;
+  save(); applyBackground(); showToast('✓ Theme applied');
+});
+document.getElementById('engine-sel').onchange=e=>{ S.engine=e.target.value; save(); updateBadge(); };
+document.getElementById('save-name').onclick=()=>{
   const v=document.getElementById('name-inp').value.trim();
-  if(v){S.name=v; save(); setGreeting(); showToast('✓ Name saved');}
+  if(v){ S.name=v; save(); setGreeting(); showToast('✓ Name saved'); }
 };
 
-// ── EXPORT / IMPORT ──
-document.getElementById('export-btn').onclick = () => {
-  const data={tabs:S.tabs,apps:S.apps,exportedAt:new Date().toISOString()};
+// ════════════════════════════════════════════
+//  EXPORT / IMPORT (includes username)
+// ════════════════════════════════════════════
+document.getElementById('export-btn').onclick=()=>{
+  const data={
+    name: S.name,
+    tabs: S.tabs,
+    apps: S.apps,
+    theme: S.theme,
+    bgType: S.bgType,
+    bgColor: S.bgColor,
+    bgWallpaper: S.bgWallpaper && !S.bgWallpaper.startsWith('data:') ? S.bgWallpaper : null,
+    wallpaperDim: S.wallpaperDim,
+    engine: S.engine,
+    exportedAt: new Date().toISOString(),
+    version: 5
+  };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download='newtab-bookmarks.json'; a.click(); URL.revokeObjectURL(url);
-  showToast('✓ Bookmarks exported');
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='newtab-backup.json'; a.click();
+  URL.revokeObjectURL(url); showToast('✓ Full backup exported');
 };
-document.getElementById('import-btn').onclick = () => document.getElementById('import-file-input').click();
-document.getElementById('import-file-input').onchange = e => {
-  const file=e.target.files[0]; if(!file) return;
+
+document.getElementById('import-btn').onclick=()=>document.getElementById('import-file-input').click();
+document.getElementById('import-file-input').onchange=e=>{
+  const file=e.target.files[0]; if(!file)return;
   const reader=new FileReader();
-  reader.onload = ev => {
+  reader.onload=ev=>{
     try {
       const data=JSON.parse(ev.target.result);
       if(!data.tabs||!data.apps) throw new Error();
-      if(!confirm(`Import ${data.tabs.length} tab(s)? This replaces current data.`)) return;
-      S.tabs=data.tabs; S.apps=data.apps; S.activeTab=data.tabs[0]?.id||S.activeTab;
-      save(); renderTabs(); renderApps(); showToast('✓ Bookmarks imported');
-    } catch { showToast('✗ Invalid file'); }
+      if(!confirm(`Import backup from ${data.exportedAt||'unknown date'}?\nThis replaces all current data.`)) return;
+      S.tabs=data.tabs; S.apps=data.apps;
+      if(data.name) S.name=data.name;
+      if(data.theme) S.theme=data.theme;
+      if(data.bgType) S.bgType=data.bgType;
+      if(data.bgColor) S.bgColor=data.bgColor;
+      if(data.bgWallpaper) S.bgWallpaper=data.bgWallpaper;
+      if(data.wallpaperDim!=null) S.wallpaperDim=data.wallpaperDim;
+      if(data.engine) S.engine=data.engine;
+      S.activeTab=data.tabs[0]?.id||S.activeTab;
+      save(); initAll(); showToast('✓ Backup imported successfully');
+    } catch { showToast('✗ Invalid backup file'); }
   };
   reader.readAsText(file); e.target.value='';
 };
 
-// ── EDIT MODE ──
-document.getElementById('edit-btn').onclick = () => { document.body.classList.toggle('edit-mode'); document.getElementById('edit-btn').classList.toggle('active'); };
-document.getElementById('done-btn').onclick = () => { document.body.classList.remove('edit-mode'); document.getElementById('edit-btn').classList.remove('active'); };
+// ════════════════════════════════════════════
+//  EDIT MODE
+// ════════════════════════════════════════════
+document.getElementById('edit-btn').onclick=()=>{ document.body.classList.toggle('edit-mode'); document.getElementById('edit-btn').classList.toggle('active'); };
+document.getElementById('done-btn').onclick=()=>{ document.body.classList.remove('edit-mode'); document.getElementById('edit-btn').classList.remove('active'); };
 
-// ── APP MODAL ──
+// ════════════════════════════════════════════
+//  APP MODAL
+// ════════════════════════════════════════════
 function openAppModal() {
   selIcon='ri-global-line'; iconSearchVal=''; activeIconCat='Common';
   document.getElementById('app-name').value=''; document.getElementById('app-url').value='';
@@ -719,9 +1076,9 @@ function openAppModal() {
   document.getElementById('app-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('app-name').focus(),80);
 }
-document.getElementById('app-cancel').onclick = () => document.getElementById('app-overlay').classList.remove('open');
-document.getElementById('app-overlay').onclick = e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); };
-document.getElementById('app-save').onclick = () => {
+document.getElementById('app-cancel').onclick=()=>document.getElementById('app-overlay').classList.remove('open');
+document.getElementById('app-overlay').onclick=e=>{ if(e.target===e.currentTarget)e.currentTarget.classList.remove('open'); };
+document.getElementById('app-save').onclick=()=>{
   const name=document.getElementById('app-name').value.trim();
   let url=document.getElementById('app-url').value.trim();
   if(!name||!url) return showToast('✗ Fill in all fields');
@@ -733,20 +1090,31 @@ document.getElementById('app-save').onclick = () => {
   showToast(`✓ ${name} added`);
 };
 
-// ── TAB MODAL ──
+// ════════════════════════════════════════════
+//  TAB MODAL
+// ════════════════════════════════════════════
 function openTabModal() { document.getElementById('tab-name-inp').value=''; document.getElementById('tab-overlay').classList.add('open'); setTimeout(()=>document.getElementById('tab-name-inp').focus(),80); }
-document.getElementById('tab-cancel').onclick = () => document.getElementById('tab-overlay').classList.remove('open');
-document.getElementById('tab-overlay').onclick = e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); };
-document.getElementById('tab-save').onclick = () => {
-  const name=document.getElementById('tab-name-inp').value.trim(); if(!name) return;
+document.getElementById('tab-cancel').onclick=()=>document.getElementById('tab-overlay').classList.remove('open');
+document.getElementById('tab-overlay').onclick=e=>{ if(e.target===e.currentTarget)e.currentTarget.classList.remove('open'); };
+document.getElementById('tab-save').onclick=()=>{
+  const name=document.getElementById('tab-name-inp').value.trim(); if(!name)return;
   const id='tab'+Date.now(); S.tabs.push({id,name}); S.apps[id]=[]; S.activeTab=id;
   save(); renderTabs(); renderApps(); document.getElementById('tab-overlay').classList.remove('open');
 };
 
-// ── INIT ──
-document.getElementById('name-inp').value=S.name;
-document.getElementById('engine-sel').value=S.engine;
-applyTheme(S.theme); updateBadge(); setGreeting(); renderTabs(); renderApps();
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+function initAll() {
+  document.getElementById('name-inp').value=S.name;
+  document.getElementById('engine-sel').value=S.engine;
+  if(S.bgColor) document.getElementById('custom-color-input').value=S.bgColor;
+  if(S.wallpaperDim!=null){ dimSlider.value=S.wallpaperDim; dimVal.textContent=S.wallpaperDim+'%'; }
+  updateBadge(); setGreeting(); renderTabs(); renderApps();
+  buildWallpaperGrid();
+  applyBackground();
+}
+initAll();
 </script>
 </body>
 </html>

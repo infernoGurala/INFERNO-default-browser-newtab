@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>New Tab</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;500&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -21,14 +22,11 @@
 
 body {
   font-family: 'Figtree', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow: hidden;
-  position: relative;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; overflow: hidden; position: relative;
 }
 
-/* ── BACKGROUND ── */
+/* ── BG ── */
 .bg-canvas {
   position: fixed; inset: 0; z-index: 0;
   background: radial-gradient(ellipse 80% 100% at 100% 60%, #5a2060 0%, #3a1545 30%, #2c1f2e 60%, #1a1020 100%);
@@ -75,7 +73,7 @@ body {
   background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.55); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; backdrop-filter: blur(10px);
+  transition: all 0.15s; backdrop-filter: blur(10px); font-size: 16px;
 }
 .ctrl-btn:hover { background: rgba(255,255,255,0.14); color: white; }
 .ctrl-btn.active { background: rgba(200,150,255,0.2); border-color: rgba(200,150,255,0.4); color: #e0c8ff; }
@@ -83,7 +81,6 @@ body {
 /* ── PAGE ── */
 .page { position: relative; z-index: 2; padding: 56px 72px 40px; max-width: 900px; }
 
-/* ── GREETING ── */
 .greeting {
   font-family: 'Fraunces', serif; font-size: 24px; font-weight: 400;
   color: var(--text); margin-bottom: 22px; letter-spacing: -0.2px;
@@ -98,14 +95,14 @@ body {
   width: 100%; box-shadow: 0 4px 40px rgba(0,0,0,0.3); transition: box-shadow 0.2s;
 }
 .search-bar:focus-within { box-shadow: 0 4px 50px rgba(0,0,0,0.35), 0 0 0 2px rgba(180,120,255,0.5); }
-.search-icon { color: #999; flex-shrink: 0; }
+.search-icon-wrap { color: #999; flex-shrink: 0; font-size: 18px; display:flex; align-items:center; }
 .search-bar input { flex: 1; border: none; outline: none; background: none; font-family: 'Figtree', sans-serif; font-size: 15px; color: #1a1a2e; }
 .search-bar input::placeholder { color: #aaa; }
 .engine-pill {
   width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700; color: white;
-  background: linear-gradient(135deg, #4285f4, #ea4335 50%, #34a853); cursor: pointer;
+  background: linear-gradient(135deg, #4285f4, #ea4335 50%, #34a853);
 }
 
 /* ── TABS ── */
@@ -121,7 +118,7 @@ body {
   content: ''; position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%);
   width: 18px; height: 2px; border-radius: 2px; background: rgba(220,200,255,0.7);
 }
-.tab.drag-over { outline: 2px dashed rgba(200,150,255,0.5); border-radius: 7px; }
+.tab.drag-over { outline: 2px dashed rgba(200,150,255,0.5); }
 .tab.dragging { opacity: 0.4; cursor: grabbing; }
 .tab-add-btn {
   width: 28px; height: 28px; border-radius: 7px;
@@ -143,28 +140,29 @@ body {
 .app-card.drag-over-card .app-icon { outline: 2px dashed rgba(200,150,255,0.6); }
 .app-icon {
   width: 70px; height: 70px; border-radius: 17px; background: var(--card-bg);
-  display: flex; align-items: center; justify-content: center; font-size: 30px;
+  display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 18px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,0.8) inset;
   transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden;
 }
+.app-icon i { font-size: 28px; color: #3a2a4a; line-height: 1; }
 .app-icon:hover { transform: translateY(-4px) scale(1.06); box-shadow: 0 14px 40px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.8) inset; }
 .app-name { font-size: 11.5px; font-weight: 400; text-align: center; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(240,232,240,0.85); }
 
-/* delete overlay in edit mode */
 body.edit-mode .app-card:not(.add-app-card) .app-icon::after {
-  content: '✕'; position: absolute; inset: 0; border-radius: 17px;
+  content: ''; position: absolute; inset: 0; border-radius: 17px;
   background: rgba(200,20,60,0.88); color: white; font-size: 20px;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity 0.15s;
+  display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s;
+  font-family: 'Figtree', sans-serif; font-weight: 600; content: '✕';
 }
 body.edit-mode .app-card:not(.add-app-card):hover .app-icon::after { opacity: 1; }
 body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
 
 .add-app-card .app-icon {
   background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.2);
-  box-shadow: none; font-size: 22px; color: var(--muted);
+  box-shadow: none; color: var(--muted);
 }
-.add-app-card:hover .app-icon { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: var(--text); transform: translateY(-2px); }
+.add-app-card .app-icon i { color: var(--muted); font-size: 22px; }
+.add-app-card:hover .app-icon { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
 .add-app-card .app-name { color: var(--muted); }
 
 /* ── SETTINGS PANEL ── */
@@ -172,11 +170,10 @@ body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
   position: fixed; right: 0; top: 0; bottom: 0; width: 270px; z-index: 100;
   background: rgba(25,12,32,0.97); backdrop-filter: blur(20px);
   border-left: 1px solid rgba(255,255,255,0.07);
-  padding: 0; display: flex; flex-direction: column;
+  display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform 0.3s ease; overflow: hidden;
 }
 .settings-panel.open { transform: translateX(0); }
-
 .settings-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
@@ -185,14 +182,11 @@ body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
 .close-settings-btn {
   width: 28px; height: 28px; border-radius: 7px;
   background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
-  color: var(--muted); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; font-size: 16px; line-height: 1;
+  color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; font-size: 16px;
 }
 .close-settings-btn:hover { background: rgba(255,255,255,0.12); color: var(--text); }
-
 .settings-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 22px; }
-
 .s-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 9px; display: block; }
 .s-inp {
   width: 100%; padding: 9px 12px; background: rgba(255,255,255,0.07);
@@ -211,8 +205,6 @@ body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
 .theme-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .t-sw { aspect-ratio: 1; border-radius: 9px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
 .t-sw.active { border-color: rgba(255,255,255,0.8); transform: scale(1.1); }
-
-/* export/import buttons */
 .io-row { display: flex; gap: 8px; }
 .io-btn {
   flex: 1; padding: 9px 10px; border-radius: 9px; text-align: center;
@@ -226,7 +218,6 @@ body.edit-mode .app-card:not(.add-app-card) { cursor: pointer; }
 .io-btn.export:hover { background: rgba(100,220,150,0.1); }
 .io-btn.import { border-color: rgba(100,180,255,0.3); color: #a0c8ff; }
 .io-btn.import:hover { background: rgba(100,180,255,0.1); }
-
 .settings-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px; color: var(--muted); line-height: 1.7; text-align: center; flex-shrink: 0; }
 
 /* ── EDIT BANNER ── */
@@ -247,13 +238,13 @@ body.edit-mode .edit-banner { display: flex; }
 /* ── MODALS ── */
 .overlay {
   position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(5px);
   display: none; align-items: center; justify-content: center;
 }
 .overlay.open { display: flex; }
 .modal {
-  background: #221430; border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 18px; padding: 26px; width: 380px; max-width: 95vw;
+  background: #1e1028; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px; padding: 26px; width: 420px; max-width: 96vw;
   animation: popIn 0.2s ease;
 }
 .modal h2 { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 400; margin-bottom: 18px; }
@@ -265,15 +256,7 @@ body.edit-mode .edit-banner { display: flex; }
   transition: border-color 0.2s;
 }
 .m-inp:focus { border-color: rgba(200,150,255,0.5); }
-.emoji-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-.e-opt {
-  width: 34px; height: 34px; border-radius: 7px; font-size: 17px;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid rgba(255,255,255,0.08); cursor: pointer;
-  background: rgba(255,255,255,0.05); transition: all 0.15s;
-}
-.e-opt.sel { border-color: rgba(200,150,255,0.6); background: rgba(200,150,255,0.15); }
-.modal-btns { display: flex; gap: 9px; }
+.modal-btns { display: flex; gap: 9px; margin-top: 16px; }
 .btn-p {
   flex: 1; padding: 10px; border-radius: 9px;
   background: rgba(200,150,255,0.22); border: 1px solid rgba(200,150,255,0.3);
@@ -289,7 +272,54 @@ body.edit-mode .edit-banner { display: flex; }
 }
 .btn-c:hover { color: var(--text); }
 
-/* toast notification */
+/* ── ICON PICKER ── */
+.icon-picker-wrap { margin-bottom: 4px; }
+.icon-search-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+.icon-search {
+  flex: 1; padding: 8px 12px; background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 9px; color: var(--text);
+  font-family: 'Figtree', sans-serif; font-size: 13px; outline: none;
+}
+.icon-search:focus { border-color: rgba(200,150,255,0.5); }
+.icon-search::placeholder { color: var(--muted); }
+
+/* currently selected icon preview */
+.icon-selected-preview {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(200,150,255,0.15); border: 1.5px solid rgba(200,150,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-selected-preview i { font-size: 20px; color: #e0c8ff; }
+
+.icon-cats { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 9px; }
+.icon-cat-btn {
+  padding: 3px 10px; border-radius: 20px; font-size: 11px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted); cursor: pointer; transition: all 0.15s;
+  font-family: 'Figtree', sans-serif;
+}
+.icon-cat-btn.active { background: rgba(200,150,255,0.2); border-color: rgba(200,150,255,0.4); color: #e0c8ff; }
+
+.icon-grid {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px;
+  max-height: 200px; overflow-y: auto; padding-right: 2px;
+}
+.icon-grid::-webkit-scrollbar { width: 4px; }
+.icon-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+.icon-opt {
+  width: 100%; aspect-ratio: 1; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05); border: 1px solid transparent;
+  cursor: pointer; transition: all 0.12s;
+}
+.icon-opt i { font-size: 18px; color: var(--muted); transition: color 0.12s; }
+.icon-opt:hover { background: rgba(255,255,255,0.1); }
+.icon-opt:hover i { color: var(--text); }
+.icon-opt.sel { background: rgba(200,150,255,0.2); border-color: rgba(200,150,255,0.5); }
+.icon-opt.sel i { color: #e0c8ff; }
+
+/* ── TOAST ── */
 .toast {
   position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(10px);
   background: rgba(40,25,50,0.95); border: 1px solid rgba(200,150,255,0.3);
@@ -312,19 +342,15 @@ body.edit-mode .edit-banner { display: flex; }
 <div class="clock-display" id="clock"></div>
 
 <div class="top-right">
-  <button class="ctrl-btn" id="edit-btn" title="Edit Mode">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-  </button>
-  <button class="ctrl-btn" id="settings-btn" title="Settings">
-    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-  </button>
+  <button class="ctrl-btn" id="edit-btn" title="Edit Mode"><i class="ri-edit-line"></i></button>
+  <button class="ctrl-btn" id="settings-btn" title="Settings"><i class="ri-settings-3-line"></i></button>
 </div>
 
 <div class="page">
   <div class="greeting" id="greeting">Welcome back</div>
   <div class="search-wrap">
     <div class="search-bar">
-      <svg class="search-icon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <div class="search-icon-wrap"><i class="ri-search-line"></i></div>
       <input type="text" id="search-input" placeholder="Search the web..." />
       <div class="engine-pill" id="engine-pill">G</div>
     </div>
@@ -333,11 +359,11 @@ body.edit-mode .edit-banner { display: flex; }
   <div class="app-grid" id="app-grid"></div>
 </div>
 
-<!-- SETTINGS PANEL -->
+<!-- SETTINGS -->
 <div class="settings-panel" id="settings-panel">
   <div class="settings-header">
-    <h3>⚙ Settings</h3>
-    <button class="close-settings-btn" id="close-settings-btn" title="Close">✕</button>
+    <h3><i class="ri-settings-3-line" style="margin-right:7px;font-size:15px;opacity:0.7"></i>Settings</h3>
+    <button class="close-settings-btn" id="close-settings-btn"><i class="ri-close-line"></i></button>
   </div>
   <div class="settings-body">
     <div>
@@ -369,27 +395,18 @@ body.edit-mode .edit-banner { display: flex; }
     <div>
       <div class="s-lbl">Bookmarks</div>
       <div class="io-row">
-        <button class="io-btn export" id="export-btn">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export
-        </button>
-        <button class="io-btn import" id="import-btn">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Import
-        </button>
+        <button class="io-btn export" id="export-btn"><i class="ri-download-line"></i> Export</button>
+        <button class="io-btn import" id="import-btn"><i class="ri-upload-line"></i> Import</button>
       </div>
-      <input type="file" id="import-file-input" accept=".json" style="display:none" />
+      <input type="file" id="import-file-input" accept=".json" style="display:none">
     </div>
   </div>
-  <div class="settings-footer">
-    Data stored locally in your browser.<br>
-    Drag tabs &amp; apps to reorder. Right-click tabs to delete.
-  </div>
+  <div class="settings-footer">Data stored locally in your browser.<br>Drag tabs &amp; apps to reorder. Right-click tabs to delete.</div>
 </div>
 
 <!-- EDIT BANNER -->
 <div class="edit-banner">
-  ✏️ Edit mode — hover apps to remove, drag to reorder
+  <i class="ri-edit-line"></i> Edit mode — hover to delete, drag to reorder
   <button class="done-btn" id="done-btn">Done</button>
 </div>
 
@@ -401,11 +418,18 @@ body.edit-mode .edit-banner { display: flex; }
     <input class="m-inp" id="app-name" placeholder="e.g. Figma" />
     <label class="m-lbl">URL</label>
     <input class="m-inp" id="app-url" placeholder="https://figma.com" />
-    <label class="m-lbl">Icon</label>
-    <div class="emoji-row" id="app-emojis"></div>
+    <label class="m-lbl">Icon — <span style="color:rgba(200,150,255,0.8);font-size:10px">Search or browse below</span></label>
+    <div class="icon-picker-wrap">
+      <div class="icon-search-row">
+        <input class="icon-search" id="icon-search" placeholder="Search icons... e.g. mail, star, home" />
+        <div class="icon-selected-preview" id="icon-preview"><i class="ri-global-line" id="icon-preview-i"></i></div>
+      </div>
+      <div class="icon-cats" id="icon-cats"></div>
+      <div class="icon-grid" id="icon-grid"></div>
+    </div>
     <div class="modal-btns">
       <button class="btn-c" id="app-cancel">Cancel</button>
-      <button class="btn-p" id="app-save">Add</button>
+      <button class="btn-p" id="app-save">Add App</button>
     </div>
   </div>
 </div>
@@ -423,49 +447,58 @@ body.edit-mode .edit-banner { display: flex; }
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-const EMOJIS = ['🌐','▶️','📘','🐦','📸','🎵','💬','🛒','📰','💼','🎮','📧','📺','🌍','⭐','💻','🏠','🎨','📊','☁️','🛡️','📱','🚀','🤖','🗂️','🔑','🧪','📡','🎬','🏋️'];
+// ── REMIX ICON LIBRARY ──
+// Organized by category: [category, [icon-names...]]
+const RI_CATS = {
+  'Common': ['global-line','home-line','search-line','star-line','heart-line','bookmark-line','settings-line','user-line','mail-line','notification-line','time-line','calendar-line','map-pin-line','link','share-line','eye-line','lock-line','key-line','shield-line','alarm-line'],
+  'Social': ['twitter-x-line','instagram-line','facebook-line','youtube-line','github-line','linkedin-line','discord-line','slack-line','telegram-line','whatsapp-line','tiktok-line','reddit-line','twitch-line','pinterest-line','snapchat-line','spotify-line','soundcloud-line','medium-line','dribbble-line','behance-line'],
+  'Media': ['play-circle-line','music-line','video-line','film-line','image-line','camera-line','headphone-line','mic-line','volume-up-line','live-line','tv-line','netflix-line','movie-line','gallery-line','slideshow-line','podcast-line','broadcast-line','radio-line','record-circle-line','shuffle-line'],
+  'Work': ['briefcase-line','building-line','team-line','presentation-line','bar-chart-line','line-chart-line','pie-chart-line','file-text-line','folder-line','archive-line','printer-line','clipboard-line','task-line','todo-line','kanban-view','flow-chart','organization-chart','survey-line','draft-line','article-line'],
+  'Tech': ['code-line','terminal-line','database-line','server-line','cloud-line','wifi-line','cpu-line','hard-drive-line','smartphone-line','tablet-line','computer-line','keyboard-line','mouse-line','usb-line','bluetooth-line','bug-line','git-branch-line','git-commit-line','git-pull-request-line','robot-line'],
+  'Finance': ['money-dollar-circle-line','bank-line','wallet-line','exchange-dollar-line','stock-line','fund-line','safe-line','coins-line','coupon-line','price-tag-line','shopping-bag-line','shopping-cart-line','store-line','vip-crown-line','trophy-line','medal-line','gift-line','percent-line','calculator-line','receipt-line'],
+  'Travel': ['plane-line','car-line','train-line','bus-line','ship-line','compass-line','map-line','map-pin-2-line','earth-line','hotel-line','restaurant-line','cup-line','luggage-cart-line','road-map-line','gas-station-line','parking-line','ride-line','flight-takeoff-line','flight-land-line','navigation-line'],
+  'Health': ['heart-pulse-line','mental-health-line','medicine-bottle-line','nurse-line','hospital-line','stethoscope-line','dna-line','capsule-line','thermometer-line','first-aid-kit-line','eye-line','tooth-line','lungs-line','brain-line','run-line','walk-line','bike-line','swimming-line','yoga-line','apple-line'],
+  'Design': ['palette-line','brush-line','pen-nib-line','pencil-line','magic-line','scissors-line','ruler-line','crop-line','contrast-line','sun-line','moon-line','blur-off-line','artboard-line','shape-line','polygon-line','drag-move-line','focus-line','align-center','grid-line','layout-line'],
+  'Misc': ['rocket-line','fire-line','leaf-line','plant-line','thunderstorms-line','snowflake-line','sun-cloudy-line','gamepad-line','sword-line','robot-2-line','alien-line','ghost-line','skull-line','flask-line','test-tube-line','microscope-line','telescope-line','anchor-line','lighthouse-line','castle-line'],
+};
 
+const ALL_ICONS = Object.entries(RI_CATS).flatMap(([cat, icons]) => icons.map(i => ({name: i, cat})));
+
+// ── DATA ──
 const DEF = {
-  name: 'Jonathan',
-  activeTab: 'recent',
-  theme: 'default',
+  name: 'Inferno', activeTab: 'recent', theme: 'default',
   engine: 'https://google.com/search?q=',
-  tabs: [
-    {id:'recent', name:'Recently Used'},
-    {id:'personal', name:'Personal'},
-    {id:'work', name:'Work'},
-  ],
+  tabs: [{id:'recent',name:'Recently Used'},{id:'personal',name:'Personal'},{id:'work',name:'Work'}],
   apps: {
     recent: [
-      {id:'g',name:'Google',url:'https://google.com',icon:'🌐'},
-      {id:'yt',name:'YouTube',url:'https://youtube.com',icon:'▶️'},
-      {id:'gh',name:'GitHub',url:'https://github.com',icon:'💻'},
-      {id:'gm',name:'Gmail',url:'https://mail.google.com',icon:'📧'},
-      {id:'sl',name:'Slack',url:'https://slack.com',icon:'💬'},
-      {id:'sp',name:'Spotify',url:'https://spotify.com',icon:'🎵'},
-      {id:'nt',name:'Notion',url:'https://notion.so',icon:'🗂️'},
-      {id:'rd',name:'Reddit',url:'https://reddit.com',icon:'🌍'},
+      {id:'g',name:'Google',url:'https://google.com',icon:'ri-global-line'},
+      {id:'yt',name:'YouTube',url:'https://youtube.com',icon:'ri-youtube-line'},
+      {id:'gh',name:'GitHub',url:'https://github.com',icon:'ri-github-line'},
+      {id:'gm',name:'Gmail',url:'https://mail.google.com',icon:'ri-mail-line'},
+      {id:'sl',name:'Slack',url:'https://slack.com',icon:'ri-slack-line'},
+      {id:'sp',name:'Spotify',url:'https://spotify.com',icon:'ri-spotify-line'},
+      {id:'nt',name:'Notion',url:'https://notion.so',icon:'ri-file-text-line'},
+      {id:'rd',name:'Reddit',url:'https://reddit.com',icon:'ri-reddit-line'},
     ],
     personal: [
-      {id:'ig',name:'Instagram',url:'https://instagram.com',icon:'📸'},
-      {id:'tw',name:'Twitter',url:'https://twitter.com',icon:'🐦'},
-      {id:'nf',name:'Netflix',url:'https://netflix.com',icon:'📺'},
+      {id:'ig',name:'Instagram',url:'https://instagram.com',icon:'ri-instagram-line'},
+      {id:'tw',name:'Twitter',url:'https://twitter.com',icon:'ri-twitter-x-line'},
+      {id:'nf',name:'Netflix',url:'https://netflix.com',icon:'ri-netflix-line'},
     ],
     work: [
-      {id:'gh2',name:'GitHub',url:'https://github.com',icon:'💻'},
-      {id:'lk',name:'LinkedIn',url:'https://linkedin.com',icon:'💼'},
-      {id:'fig',name:'Figma',url:'https://figma.com',icon:'🎨'},
-      {id:'gd',name:'Drive',url:'https://drive.google.com',icon:'☁️'},
+      {id:'gh2',name:'GitHub',url:'https://github.com',icon:'ri-github-line'},
+      {id:'lk',name:'LinkedIn',url:'https://linkedin.com',icon:'ri-linkedin-line'},
+      {id:'fig',name:'Figma',url:'https://figma.com',icon:'ri-pen-nib-line'},
+      {id:'gd',name:'Drive',url:'https://drive.google.com',icon:'ri-cloud-line'},
     ]
   }
 };
 
-let S = (() => { try { return JSON.parse(localStorage.getItem('nt_v3') || 'null') || JSON.parse(JSON.stringify(DEF)); } catch(e) { return JSON.parse(JSON.stringify(DEF)); } })();
-const save = () => localStorage.setItem('nt_v3', JSON.stringify(S));
+let S = (() => { try { return JSON.parse(localStorage.getItem('nt_v4')||'null')||JSON.parse(JSON.stringify(DEF)); } catch(e) { return JSON.parse(JSON.stringify(DEF)); }})();
+const save = () => localStorage.setItem('nt_v4', JSON.stringify(S));
 
 // ── TOAST ──
 let toastTimer;
@@ -476,284 +509,243 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ── CLOCK (12hr) ──
+// ── CLOCK 12HR ──
 function tick() {
-  const n = new Date();
-  let h = n.getHours(); const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  const m = n.getMinutes().toString().padStart(2,'0');
-  document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+  const n = new Date(); let h = n.getHours();
+  const ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  document.getElementById('clock').textContent = `${h}:${n.getMinutes().toString().padStart(2,'0')} ${ampm}`;
 }
 tick(); setInterval(tick, 10000);
 
 // ── GREETING ──
 function setGreeting() {
   const h = new Date().getHours();
-  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const g = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
   document.getElementById('greeting').textContent = `${g}, ${S.name}`;
 }
 
 // ── THEME ──
 function applyTheme(t) {
-  if (t === 'default') document.body.removeAttribute('data-theme');
+  if (t==='default') document.body.removeAttribute('data-theme');
   else document.body.setAttribute('data-theme', t);
-  document.querySelectorAll('.t-sw').forEach(s => s.classList.toggle('active', s.dataset.theme === t));
+  document.querySelectorAll('.t-sw').forEach(s => s.classList.toggle('active', s.dataset.theme===t));
 }
 
 // ── ENGINE BADGE ──
 const ENGINE_BADGES = {'google':'G','duckduckgo':'D','brave':'B','bing':'Ⓑ'};
 function updateBadge() {
-  const k = Object.keys(ENGINE_BADGES).find(k => S.engine.includes(k)) || 'google';
+  const k = Object.keys(ENGINE_BADGES).find(k => S.engine.includes(k))||'google';
   document.getElementById('engine-pill').textContent = ENGINE_BADGES[k];
 }
 
-// ── RENDER TABS (with drag-to-reorder) ──
-let dragTabId = null;
+// ── ICON PICKER ──
+let selIcon = 'ri-global-line';
+let activeIconCat = 'Common';
+let iconSearchVal = '';
 
+function buildIconPicker() {
+  // Categories
+  const catWrap = document.getElementById('icon-cats');
+  catWrap.innerHTML = '';
+  ['All', ...Object.keys(RI_CATS)].forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'icon-cat-btn' + (activeIconCat === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { activeIconCat = cat; buildIconGrid(); catWrap.querySelectorAll('.icon-cat-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
+    catWrap.appendChild(btn);
+  });
+  buildIconGrid();
+}
+
+function buildIconGrid() {
+  const grid = document.getElementById('icon-grid');
+  grid.innerHTML = '';
+  const q = iconSearchVal.toLowerCase();
+  let list = q
+    ? ALL_ICONS.filter(ic => ic.name.includes(q))
+    : (activeIconCat === 'All' ? ALL_ICONS : ALL_ICONS.filter(ic => ic.cat === activeIconCat));
+
+  if (list.length === 0) {
+    grid.innerHTML = '<div style="color:var(--muted);font-size:12px;grid-column:1/-1;padding:12px 0">No icons found</div>';
+    return;
+  }
+
+  list.forEach(ic => {
+    const cls = 'ri-' + ic.name;
+    const el = document.createElement('div');
+    el.className = 'icon-opt' + (selIcon === cls ? ' sel' : '');
+    el.title = ic.name.replace(/-/g,' ');
+    el.innerHTML = `<i class="${cls}"></i>`;
+    el.onclick = () => {
+      selIcon = cls;
+      document.getElementById('icon-preview-i').className = cls;
+      grid.querySelectorAll('.icon-opt').forEach(x=>x.classList.remove('sel'));
+      el.classList.add('sel');
+    };
+    grid.appendChild(el);
+  });
+}
+
+document.getElementById('icon-search').addEventListener('input', e => {
+  iconSearchVal = e.target.value;
+  buildIconGrid();
+});
+
+// ── RENDER TABS (drag reorder) ──
+let dragTabId = null;
 function renderTabs() {
   const bar = document.getElementById('tab-bar');
   bar.innerHTML = '';
-
   S.tabs.forEach(tab => {
     const btn = document.createElement('button');
-    btn.className = 'tab' + (tab.id === S.activeTab ? ' active' : '');
-    btn.textContent = tab.name;
-    btn.draggable = true;
-    btn.dataset.id = tab.id;
-
-    // click to switch
-    btn.onclick = () => {
-      S.activeTab = tab.id;
-      if (!S.apps[tab.id]) S.apps[tab.id] = [];
-      save(); renderTabs(); renderApps();
-    };
-
-    // right-click to delete
+    btn.className = 'tab' + (tab.id===S.activeTab?' active':'');
+    btn.textContent = tab.name; btn.draggable = true; btn.dataset.id = tab.id;
+    btn.onclick = () => { S.activeTab=tab.id; if(!S.apps[tab.id]) S.apps[tab.id]=[]; save(); renderTabs(); renderApps(); };
     btn.oncontextmenu = e => {
-      e.preventDefault();
-      if (S.tabs.length <= 1) return;
-      if (!confirm(`Delete "${tab.name}"?`)) return;
-      S.tabs = S.tabs.filter(t => t.id !== tab.id);
-      delete S.apps[tab.id];
-      if (S.activeTab === tab.id) S.activeTab = S.tabs[0].id;
+      e.preventDefault(); if(S.tabs.length<=1) return;
+      if(!confirm(`Delete "${tab.name}"?`)) return;
+      S.tabs = S.tabs.filter(t=>t.id!==tab.id); delete S.apps[tab.id];
+      if(S.activeTab===tab.id) S.activeTab=S.tabs[0].id;
       save(); renderTabs(); renderApps();
     };
-
-    // drag events for reordering
-    btn.addEventListener('dragstart', e => {
-      dragTabId = tab.id;
-      btn.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    btn.addEventListener('dragend', () => {
-      dragTabId = null;
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('dragging','drag-over'));
-    });
-    btn.addEventListener('dragover', e => {
-      if (!dragTabId || dragTabId === tab.id) return;
-      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('drag-over'));
-      btn.classList.add('drag-over');
-    });
+    btn.addEventListener('dragstart', e => { dragTabId=tab.id; btn.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    btn.addEventListener('dragend', () => { dragTabId=null; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('dragging','drag-over')); });
+    btn.addEventListener('dragover', e => { if(!dragTabId||dragTabId===tab.id) return; e.preventDefault(); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('drag-over')); btn.classList.add('drag-over'); });
     btn.addEventListener('dragleave', () => btn.classList.remove('drag-over'));
     btn.addEventListener('drop', e => {
-      e.preventDefault();
-      if (!dragTabId || dragTabId === tab.id) return;
-      const fromIdx = S.tabs.findIndex(t => t.id === dragTabId);
-      const toIdx = S.tabs.findIndex(t => t.id === tab.id);
-      const [moved] = S.tabs.splice(fromIdx, 1);
-      S.tabs.splice(toIdx, 0, moved);
+      e.preventDefault(); if(!dragTabId||dragTabId===tab.id) return;
+      const fi=S.tabs.findIndex(t=>t.id===dragTabId), ti=S.tabs.findIndex(t=>t.id===tab.id);
+      const [mv]=S.tabs.splice(fi,1); S.tabs.splice(ti,0,mv);
       save(); renderTabs();
     });
-
     bar.appendChild(btn);
   });
-
-  const addBtn = document.createElement('button');
-  addBtn.className = 'tab-add-btn'; addBtn.textContent = '+';
-  addBtn.onclick = () => openTabModal();
-  bar.appendChild(addBtn);
+  const add = document.createElement('button');
+  add.className='tab-add-btn'; add.textContent='+'; add.onclick=()=>openTabModal();
+  bar.appendChild(add);
 }
 
-// ── RENDER APPS (with drag-to-reorder) ──
+// ── RENDER APPS (drag reorder + remix icons) ──
 let dragAppId = null;
-
 function renderApps() {
   const grid = document.getElementById('app-grid');
   grid.innerHTML = '';
-  const apps = S.apps[S.activeTab] || [];
-
-  apps.forEach((app, i) => {
+  const apps = S.apps[S.activeTab]||[];
+  apps.forEach((app,i) => {
     const card = document.createElement('a');
-    card.className = 'app-card'; card.href = app.url;
-    card.draggable = true;
-    card.dataset.id = app.id;
-    card.style.animationDelay = `${i * 30}ms`;
-    card.innerHTML = `<div class="app-icon">${app.icon}</div><div class="app-name">${app.name}</div>`;
-
-    // click/edit-mode delete
+    card.className='app-card'; card.href=app.url; card.draggable=true; card.dataset.id=app.id;
+    card.style.animationDelay=`${i*30}ms`;
+    card.innerHTML = `<div class="app-icon"><i class="${app.icon}"></i></div><div class="app-name">${app.name}</div>`;
     card.addEventListener('click', e => {
-      if (document.body.classList.contains('edit-mode')) {
+      if(document.body.classList.contains('edit-mode')) {
         e.preventDefault();
-        S.apps[S.activeTab] = (S.apps[S.activeTab] || []).filter(a => a.id !== app.id);
+        S.apps[S.activeTab]=(S.apps[S.activeTab]||[]).filter(a=>a.id!==app.id);
         save(); renderTabs(); renderApps();
       }
     });
-
-    // drag reorder
-    card.addEventListener('dragstart', e => {
-      dragAppId = app.id;
-      setTimeout(() => card.classList.add('dragging'), 0);
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    card.addEventListener('dragend', () => {
-      dragAppId = null;
-      document.querySelectorAll('.app-card').forEach(c => c.classList.remove('dragging','drag-over-card'));
-    });
-    card.addEventListener('dragover', e => {
-      if (!dragAppId || dragAppId === app.id) return;
-      e.preventDefault();
-      document.querySelectorAll('.app-card').forEach(c => c.classList.remove('drag-over-card'));
-      card.classList.add('drag-over-card');
-    });
-    card.addEventListener('dragleave', () => card.classList.remove('drag-over-card'));
+    card.addEventListener('dragstart', e => { dragAppId=app.id; setTimeout(()=>card.classList.add('dragging'),0); e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend', () => { dragAppId=null; document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('dragging','drag-over-card')); });
+    card.addEventListener('dragover', e => { if(!dragAppId||dragAppId===app.id) return; e.preventDefault(); document.querySelectorAll('.app-card').forEach(c=>c.classList.remove('drag-over-card')); card.classList.add('drag-over-card'); });
+    card.addEventListener('dragleave', ()=>card.classList.remove('drag-over-card'));
     card.addEventListener('drop', e => {
-      e.preventDefault();
-      if (!dragAppId || dragAppId === app.id) return;
-      const list = S.apps[S.activeTab];
-      const fromIdx = list.findIndex(a => a.id === dragAppId);
-      const toIdx = list.findIndex(a => a.id === app.id);
-      const [moved] = list.splice(fromIdx, 1);
-      list.splice(toIdx, 0, moved);
+      e.preventDefault(); if(!dragAppId||dragAppId===app.id) return;
+      const list=S.apps[S.activeTab];
+      const fi=list.findIndex(a=>a.id===dragAppId), ti=list.findIndex(a=>a.id===app.id);
+      const [mv]=list.splice(fi,1); list.splice(ti,0,mv);
       save(); renderApps();
     });
-
     grid.appendChild(card);
   });
-
   const addCard = document.createElement('div');
-  addCard.className = 'app-card add-app-card';
-  addCard.innerHTML = `<div class="app-icon">+</div><div class="app-name">Add</div>`;
-  addCard.onclick = () => openAppModal();
+  addCard.className='app-card add-app-card';
+  addCard.innerHTML=`<div class="app-icon"><i class="ri-add-line"></i></div><div class="app-name">Add</div>`;
+  addCard.onclick=()=>openAppModal();
   grid.appendChild(addCard);
 }
 
 // ── SEARCH ──
 document.getElementById('search-input').addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  const q = e.target.value.trim(); if (!q) return;
-  const isURL = /^https?:\/\//.test(q) || (/\.[a-z]{2,}/.test(q) && !q.includes(' '));
-  window.location.href = isURL ? (q.startsWith('http') ? q : 'https://'+q) : S.engine + encodeURIComponent(q);
+  if(e.key!=='Enter') return;
+  const q=e.target.value.trim(); if(!q) return;
+  const isURL=/^https?:\/\//.test(q)||(/\.[a-z]{2,}/.test(q)&&!q.includes(' '));
+  window.location.href = isURL?(q.startsWith('http')?q:'https://'+q):S.engine+encodeURIComponent(q);
 });
 
-// ── SETTINGS OPEN / CLOSE ──
+// ── SETTINGS ──
 document.getElementById('settings-btn').onclick = () => document.getElementById('settings-panel').classList.add('open');
 document.getElementById('close-settings-btn').onclick = () => document.getElementById('settings-panel').classList.remove('open');
-
-document.querySelectorAll('.t-sw').forEach(s => s.onclick = () => { S.theme = s.dataset.theme; save(); applyTheme(S.theme); });
-document.getElementById('engine-sel').onchange = e => { S.engine = e.target.value; save(); updateBadge(); };
+document.querySelectorAll('.t-sw').forEach(s => s.onclick=()=>{ S.theme=s.dataset.theme; save(); applyTheme(S.theme); });
+document.getElementById('engine-sel').onchange = e => { S.engine=e.target.value; save(); updateBadge(); };
 document.getElementById('save-name').onclick = () => {
-  const v = document.getElementById('name-inp').value.trim();
-  if (v) { S.name = v; save(); setGreeting(); showToast('✓ Name saved'); }
+  const v=document.getElementById('name-inp').value.trim();
+  if(v){S.name=v; save(); setGreeting(); showToast('✓ Name saved');}
 };
 
-// ── EXPORT ──
+// ── EXPORT / IMPORT ──
 document.getElementById('export-btn').onclick = () => {
-  const data = { tabs: S.tabs, apps: S.apps, exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'newtab-bookmarks.json'; a.click();
-  URL.revokeObjectURL(url);
+  const data={tabs:S.tabs,apps:S.apps,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download='newtab-bookmarks.json'; a.click(); URL.revokeObjectURL(url);
   showToast('✓ Bookmarks exported');
 };
-
-// ── IMPORT ──
 document.getElementById('import-btn').onclick = () => document.getElementById('import-file-input').click();
 document.getElementById('import-file-input').onchange = e => {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
   reader.onload = ev => {
     try {
-      const data = JSON.parse(ev.target.result);
-      if (!data.tabs || !data.apps) throw new Error('Invalid format');
-      if (!confirm(`Import ${data.tabs.length} tab(s)? This will REPLACE your current tabs and apps.`)) return;
-      S.tabs = data.tabs;
-      S.apps = data.apps;
-      S.activeTab = data.tabs[0]?.id || S.activeTab;
-      save(); renderTabs(); renderApps();
-      showToast('✓ Bookmarks imported successfully');
-    } catch(err) {
-      showToast('✗ Invalid file — import failed');
-    }
+      const data=JSON.parse(ev.target.result);
+      if(!data.tabs||!data.apps) throw new Error();
+      if(!confirm(`Import ${data.tabs.length} tab(s)? This replaces current data.`)) return;
+      S.tabs=data.tabs; S.apps=data.apps; S.activeTab=data.tabs[0]?.id||S.activeTab;
+      save(); renderTabs(); renderApps(); showToast('✓ Bookmarks imported');
+    } catch { showToast('✗ Invalid file'); }
   };
-  reader.readAsText(file);
-  e.target.value = ''; // reset so same file can be re-imported
+  reader.readAsText(file); e.target.value='';
 };
 
 // ── EDIT MODE ──
-document.getElementById('edit-btn').onclick = () => {
-  document.body.classList.toggle('edit-mode');
-  document.getElementById('edit-btn').classList.toggle('active');
-};
-document.getElementById('done-btn').onclick = () => {
-  document.body.classList.remove('edit-mode');
-  document.getElementById('edit-btn').classList.remove('active');
-};
+document.getElementById('edit-btn').onclick = () => { document.body.classList.toggle('edit-mode'); document.getElementById('edit-btn').classList.toggle('active'); };
+document.getElementById('done-btn').onclick = () => { document.body.classList.remove('edit-mode'); document.getElementById('edit-btn').classList.remove('active'); };
 
 // ── APP MODAL ──
-let selEmoji = '🌐';
-function buildEmojis() {
-  const row = document.getElementById('app-emojis'); row.innerHTML = '';
-  EMOJIS.forEach(em => {
-    const el = document.createElement('div');
-    el.className = 'e-opt' + (em === selEmoji ? ' sel' : '');
-    el.textContent = em;
-    el.onclick = () => { selEmoji = em; row.querySelectorAll('.e-opt').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); };
-    row.appendChild(el);
-  });
-}
 function openAppModal() {
-  selEmoji = '🌐';
-  document.getElementById('app-name').value = '';
-  document.getElementById('app-url').value = '';
-  buildEmojis();
+  selIcon='ri-global-line'; iconSearchVal=''; activeIconCat='Common';
+  document.getElementById('app-name').value=''; document.getElementById('app-url').value='';
+  document.getElementById('icon-search').value='';
+  document.getElementById('icon-preview-i').className='ri-global-line';
+  buildIconPicker();
   document.getElementById('app-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('app-name').focus(), 80);
+  setTimeout(()=>document.getElementById('app-name').focus(),80);
 }
 document.getElementById('app-cancel').onclick = () => document.getElementById('app-overlay').classList.remove('open');
 document.getElementById('app-overlay').onclick = e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); };
 document.getElementById('app-save').onclick = () => {
-  const name = document.getElementById('app-name').value.trim();
-  let url = document.getElementById('app-url').value.trim();
-  if (!name || !url) return showToast('✗ Fill in all fields');
-  if (!url.startsWith('http')) url = 'https://' + url;
-  if (!S.apps[S.activeTab]) S.apps[S.activeTab] = [];
-  S.apps[S.activeTab].push({id: Date.now()+'', name, url, icon: selEmoji});
+  const name=document.getElementById('app-name').value.trim();
+  let url=document.getElementById('app-url').value.trim();
+  if(!name||!url) return showToast('✗ Fill in all fields');
+  if(!url.startsWith('http')) url='https://'+url;
+  if(!S.apps[S.activeTab]) S.apps[S.activeTab]=[];
+  S.apps[S.activeTab].push({id:Date.now()+'',name,url,icon:selIcon});
   save(); renderTabs(); renderApps();
   document.getElementById('app-overlay').classList.remove('open');
   showToast(`✓ ${name} added`);
 };
 
 // ── TAB MODAL ──
-function openTabModal() {
-  document.getElementById('tab-name-inp').value = '';
-  document.getElementById('tab-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('tab-name-inp').focus(), 80);
-}
+function openTabModal() { document.getElementById('tab-name-inp').value=''; document.getElementById('tab-overlay').classList.add('open'); setTimeout(()=>document.getElementById('tab-name-inp').focus(),80); }
 document.getElementById('tab-cancel').onclick = () => document.getElementById('tab-overlay').classList.remove('open');
 document.getElementById('tab-overlay').onclick = e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); };
 document.getElementById('tab-save').onclick = () => {
-  const name = document.getElementById('tab-name-inp').value.trim(); if (!name) return;
-  const id = 'tab' + Date.now();
-  S.tabs.push({id, name}); S.apps[id] = []; S.activeTab = id;
-  save(); renderTabs(); renderApps();
-  document.getElementById('tab-overlay').classList.remove('open');
+  const name=document.getElementById('tab-name-inp').value.trim(); if(!name) return;
+  const id='tab'+Date.now(); S.tabs.push({id,name}); S.apps[id]=[]; S.activeTab=id;
+  save(); renderTabs(); renderApps(); document.getElementById('tab-overlay').classList.remove('open');
 };
 
 // ── INIT ──
-document.getElementById('name-inp').value = S.name;
-document.getElementById('engine-sel').value = S.engine;
+document.getElementById('name-inp').value=S.name;
+document.getElementById('engine-sel').value=S.engine;
 applyTheme(S.theme); updateBadge(); setGreeting(); renderTabs(); renderApps();
 </script>
 </body>
